@@ -79,6 +79,8 @@ public:
     void mouseMoved(const glm::dvec2 &p);
     void mouseReleased(const glm::dvec2 &p);
 
+    void mouseWheelMoved(double delta);
+
     // Debug information and flags
     int getNumParticles();
     double getKineticEnergy();
@@ -128,6 +130,7 @@ private:
 
     // moveMode
     bool objectMoveMode;
+    double rigigBodyAngle = 0;
 };
 
 #endif // SIMULATION_H

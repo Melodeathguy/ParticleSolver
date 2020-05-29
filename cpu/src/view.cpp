@@ -16,8 +16,8 @@ View::View(QWidget *parent) : QGLWidget(parent)
     // The game loop is implemented using a timer
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
-    fps = 120;
-    scale = 10;
+    fps = 60;
+    scale = 30;
 
     // TODO: Make automatic!
     double screenHeight = 1050.;
@@ -123,12 +123,15 @@ void View::mouseReleaseEvent(QMouseEvent *event)
 
 void View::wheelEvent(QWheelEvent *event)
 {
+    /*
     if (event->delta() > 0) {
         scale /= 1.2;
     } else {
         scale *= 1.2;
     }
     sim.resize(glm::ivec2(scale, scale));
+        */
+    sim.mouseWheelMoved(event->delta() / 1000.);
 }
 
 void View::keyPressEvent(QKeyEvent *event)
@@ -211,7 +214,7 @@ void View::tick()
             tickTime = 0.0;
         }
     } else {
-        sim.tick(.02);
+        sim.tick(.01);
     }
 
     // Flag this view for repainting (Qt will call paintGL() soon after)

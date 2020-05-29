@@ -1294,25 +1294,37 @@ void Simulation::initSandDigger()
     m_yBoundaries = glm::dvec2(-5, 1000);
     m_gravity = glm::dvec2(0,-9.8);
 
+
+
     // Draw Digger Shuffle
     double pi = 3.14159265359;
     double diggerRadius = 5.;
-    glm::dvec2 diggerPos = glm::dvec2(0., 10.);
-    double assemblyAngle = atan(2*PARTICLE_RAD / diggerRadius);
+    int diggerRings = 3;
+    glm::dvec2 diggerPos = glm::dvec2(10., 10.);
 
+    double assemblyAngle;
     QList<Particle *> vertices;
     QList<SDFData> data;
-    for(double a = 0; a < pi; a += assemblyAngle){
-        double xPos = diggerRadius * cos(-a);
-        double yPos = diggerRadius * sin(-a);
-        std::cout << xPos << ", " <<yPos << "\n";
-        data.append(SDFData(glm::normalize(glm::dvec2(xPos,yPos)), diggerRadius));
-        Particle *part = new Particle(diggerPos + glm::dvec2(xPos, yPos), 4.);
-        part->sFriction = 1.;
-        part->kFriction = 1.;
-        vertices.append(part);
-    }
 
+    for(int r = 0; r < diggerRings; r++){
+
+        double ringRadius = diggerRadius + 2 * r * PARTICLE_RAD;
+        assemblyAngle = atan(2*PARTICLE_RAD / ringRadius);
+
+        for(double a = 0; a < pi; a += assemblyAngle){
+            double xPos = ringRadius * cos(-a);
+            double yPos = ringRadius * sin(-a);
+            //std::cout << xPos << ", " <<yPos << "\n";
+            data.append(SDFData(glm::normalize(glm::dvec2(xPos,yPos)), ringRadius));
+            Particle *part = new Particle(diggerPos + glm::dvec2(xPos, yPos), 5., SOLID);
+
+            //Particle(glm::dvec2(0, chainLength * 3 + 6) * PARTICLE_DIAM + glm::dvec2(0,2), 0, SOLID)
+
+            part->sFriction = 1.;
+            part->kFriction = 1.;
+            vertices.append(part);
+        }
+    }
     Body *body = createRigidBody(&vertices, &data);
     vertices.clear();
 
@@ -1375,7 +1387,7 @@ void Simulation::mouseMoved(const glm::dvec2 &p)
             Particle * part = m_particles.at(particleId);
 
             part->p = p - (body->center - part->p);
-            std::cout << body->center.x << ", " << part->p.x << "\n";
+            //std::cout << body->center.x << ", " << part->p.x << "\n";
             part->v = zeroVec;
         }
         body->center = p;
@@ -1385,4 +1397,24 @@ void Simulation::mouseMoved(const glm::dvec2 &p)
 void Simulation::mouseReleased(const glm::dvec2 &p)
 {
     this->objectMoveMode = false;
+}
+
+void Simulation::mouseWheelMoved(double delta){
+    int noSolidObjects = this->m_bodies.size();
+    if (noSolidObjects){
+        Body * body = this->m_bodies.first();
+        glm::dvec2 zeroVec = glm::dvec2(0., 0.);
+
+        double pi = 3.14159265359;
+
+        for(int i = 0; i < body->particles.size(); i++){
+            int particleId = body->particles.at(i);
+            Particle * part = m_particles.at(particleId);
+            this->rigigBodyAngle = fmod(this->rigigBodyAngle + delta, 2*pi);
+            glm::dvec2 rotated = glm::rotate(body->center - part->p, delta);
+
+            part->p = body->center - rotated;
+            part->v = zeroVec;
+        }
+    }
 }
