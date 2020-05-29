@@ -14,7 +14,7 @@
    <!-------------------------------------------------------------------->**/
 
 #include "lineareq.h"
-#include <UMFPACK/umfpack.h>
+#include <umfpack.h>
 #include <algorithm>
 
 struct SparseMatrixElement {
