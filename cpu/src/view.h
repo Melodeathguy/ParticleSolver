@@ -19,6 +19,7 @@ private:
     QTimer timer;
     double fps, tickTime;
     double scale;
+    double aspect;
     bool timestepMode;
 
     glm::ivec2 dimensions;

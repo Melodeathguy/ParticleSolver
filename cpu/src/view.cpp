@@ -16,8 +16,13 @@ View::View(QWidget *parent) : QGLWidget(parent)
     // The game loop is implemented using a timer
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
-    fps = 60;
+    fps = 120;
     scale = 10;
+
+    // TODO: Make automatic!
+    double screenHeight = 1050.;
+    double screenWidth = 1680.;
+    aspect = screenWidth / screenHeight;
     tickTime = 0.0;
     timestepMode = true;
     current = FLUID_TEST;
@@ -54,7 +59,7 @@ void View::paintGL()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-scale, scale, -scale, scale, -1, 1);
+    glOrtho(-scale * aspect, scale * aspect, -scale, scale, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -127,6 +132,7 @@ void View::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Backspace) tickTime = -.01;
     if (event->key() == Qt::Key_C) sim.debug = !sim.debug;
 
+
     if (event->key() == Qt::Key_1) {
         current = GRANULAR_TEST;
         sim.init(current);
@@ -175,6 +181,9 @@ void View::keyPressEvent(QKeyEvent *event)
     } else if (event->key() == Qt::Key_W) {
         current = WRECKING_BALL;
         sim.init(current);
+    } else if (event->key() == Qt::Key_Q) {
+        current = SAND_DIGGER_TEST;
+        sim.init(current);
     }
 }
 
@@ -194,7 +203,7 @@ void View::tick()
             tickTime = 0.0;
         }
     } else {
-        sim.tick(.01);
+        sim.tick(.02);
     }
 
     // Flag this view for repainting (Qt will call paintGL() soon after)

@@ -11,7 +11,7 @@
 Simulation::Simulation()
 {
     m_counts = NULL;
-    init(WRECKING_BALL);
+    init(SAND_DIGGER_TEST);
     debug = true;
 }
 
@@ -101,6 +101,8 @@ void Simulation::init(SimulationType type)
         initVolcano(); break;
     case WRECKING_BALL:
         initWreckingBall(); break;
+    case SAND_DIGGER_TEST:
+        initSandDigger(); break;
     default:
         initBoxes(); break;
     }
@@ -487,6 +489,7 @@ void Simulation::drawGrid()
     glColor3f(.2,.2,.2);
     glBegin(GL_LINES);
 
+    /* //TODO: Fit screen resolution
     for (int x = -m_dimensions.x; x <= m_dimensions.x; x++) {
         glVertex2f(x, -m_dimensions.y);
         glVertex2f(x, m_dimensions.y);
@@ -504,7 +507,7 @@ void Simulation::drawGrid()
     glVertex2f(0, m_dimensions.y);
 
     glEnd();
-
+    */
     glLineWidth(3);
     glBegin(GL_LINES);
     glVertex2f(m_xBoundaries.x, m_yBoundaries.x);
@@ -1283,6 +1286,51 @@ void Simulation::initWreckingBall()
     createRigidBody(&particles, &data);
 
     m_globalConstraints[STANDARD].append(new DistanceConstraint(idx, idx + 1, &m_particles));
+}
+
+void Simulation::initSandDigger()
+{
+    m_xBoundaries = glm::dvec2(-100,100);
+    m_yBoundaries = glm::dvec2(-5, 1000);
+    m_gravity = glm::dvec2(0,-9.8);
+
+    // Draw Digger Shuffle
+    double pi = 3.14159265359;
+    double diggerRadius = 5.;
+    glm::dvec2 diggerPos = glm::dvec2(0., 10.);
+    double assemblyAngle = atan(2*PARTICLE_RAD / diggerRadius);
+
+    QList<Particle *> vertices;
+    QList<SDFData> data;
+    for(double a = 0; a < pi; a += assemblyAngle){
+        double xPos = diggerRadius * cos(-a);
+        double yPos = diggerRadius * sin(-a);
+        std::cout << xPos << ", " <<yPos << "\n";
+        data.append(SDFData(glm::normalize(glm::dvec2(xPos,yPos)), diggerRadius));
+        Particle *part = new Particle(diggerPos + glm::dvec2(xPos, yPos), 4.);
+        part->sFriction = 1.;
+        part->kFriction = 1.;
+        vertices.append(part);
+    }
+
+    Body *body = createRigidBody(&vertices, &data);
+    vertices.clear();
+
+
+
+    for (int i = -15; i <= 15; i++) {
+        for (int j = 0; j < 30; j++) {
+            glm::dvec2 pos = glm::dvec2(i * (PARTICLE_DIAM + EPSILON), pow(j,1.2) * (PARTICLE_DIAM) + PARTICLE_RAD + m_yBoundaries.x);
+            Particle *part= new Particle(pos, 1, SOLID);
+            part->sFriction = .35;
+            part->kFriction = .3;
+            m_particles.append(part);
+        }
+    }
+
+    Particle *jerk = new Particle(glm::dvec2(-25.55, 40), 100.f, SOLID);
+    jerk->v.x = 8.5;
+    m_particles.append(jerk);
 }
 
 int Simulation::getNumParticles()
