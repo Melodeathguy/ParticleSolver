@@ -87,12 +87,14 @@ void View::resizeGL(int w, int h)
 void View::mousePressEvent(QMouseEvent *event)
 {
     glm::dvec2 screen(event->x(), height() - event->y());
-    glm::dvec2 world = (scale * 2.) * (screen / glm::dvec2(width(), height())) - glm::dvec2((double)scale, (double)scale);
+    glm::dvec2 aspectScale = glm::dvec2((double)(scale * aspect), (double) scale);
+    glm::dvec2 world = (aspectScale * 2.) * (screen / glm::dvec2(width(), height())) - aspectScale;
     sim.mousePressed(world);
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)
 {
+    /*
     // This starter code implements mouse capture, which gives the change in
     // mouse position since the last mouse movement. The mouse needs to be
     // recentered after every movement because it might otherwise run into
@@ -104,13 +106,19 @@ void View::mouseMoveEvent(QMouseEvent *event)
     int deltaY = event->y() - height() / 2;
     if (!deltaX && !deltaY) return;
 //    QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
-
-    // TODO: Handle mouse movements here
+    */
+    glm::dvec2 screen(event->x(), height() - event->y());
+    glm::dvec2 aspectScale = glm::dvec2((double)(scale * aspect), (double) scale);
+    glm::dvec2 world = (aspectScale * 2.) * (screen / glm::dvec2(width(), height())) - aspectScale;
+    this->sim.mouseMoved(world);
 }
 
 void View::mouseReleaseEvent(QMouseEvent *event)
 {
-
+    glm::dvec2 screen(event->x(), height() - event->y());
+    glm::dvec2 aspectScale = glm::dvec2((double)(scale * aspect), (double) scale);
+    glm::dvec2 world = (aspectScale * 2.) * (screen / glm::dvec2(width(), height())) - aspectScale;
+    sim.mouseReleased(world);
 }
 
 void View::wheelEvent(QWheelEvent *event)

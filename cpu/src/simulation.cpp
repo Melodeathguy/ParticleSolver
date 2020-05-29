@@ -1352,11 +1352,37 @@ double Simulation::getKineticEnergy()
 
 void Simulation::mousePressed(const glm::dvec2 &p)
 {
-    for (int i = 0; i < m_particles.size(); i++) {
-        Particle *part = m_particles.at(i);
+    this->objectMoveMode = true;
+    //std::cout << "click : (" << p.x << "," << p.y << ")\n";
+    this->mouseMoved(p);
+}
 
-        glm::dvec2 to = glm::normalize(p - part->p);
-        part->v += 7. * to;
+void Simulation::mouseMoved(const glm::dvec2 &p)
+{
+    if (!this->objectMoveMode){
+        return;
     }
-    m_point = p;
+
+    int noSolidObjects = this->m_bodies.size();
+    if (noSolidObjects){
+        Body * body = this->m_bodies.first();
+        glm::dvec2 zeroVec = glm::dvec2(0., 0.);
+
+        std::cout << "particle size:" << body->particles.size() << "\n";
+
+        for(int i = 0; i < body->particles.size(); i++){
+            int particleId = body->particles.at(i);
+            Particle * part = m_particles.at(particleId);
+
+            part->p = p - (body->center - part->p);
+            std::cout << body->center.x << ", " << part->p.x << "\n";
+            part->v = zeroVec;
+        }
+        body->center = p;
+    }
+}
+
+void Simulation::mouseReleased(const glm::dvec2 &p)
+{
+    this->objectMoveMode = false;
 }

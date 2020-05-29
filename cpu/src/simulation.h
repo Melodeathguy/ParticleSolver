@@ -76,6 +76,8 @@ public:
     void draw();
     void resize(const glm::ivec2 &dim);
     void mousePressed(const glm::dvec2 &p);
+    void mouseMoved(const glm::dvec2 &p);
+    void mouseReleased(const glm::dvec2 &p);
 
     // Debug information and flags
     int getNumParticles();
@@ -123,6 +125,9 @@ private:
     glm::dvec2 m_xBoundaries, m_yBoundaries;
     glm::dvec2 m_gravity;
     glm::dvec2 m_point;
+
+    // moveMode
+    bool objectMoveMode;
 };
 
 #endif // SIMULATION_H
