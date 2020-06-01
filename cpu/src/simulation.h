@@ -14,7 +14,7 @@
 #define ITERATIVE
 
 // Use stabilization pass or not, and if so how many iterations
-//#define USE_STABILIZATION
+#define USE_STABILIZATION
 #define STABILIZATION_ITERATIONS 2
 
 // Gravity scaling factor for gases

@@ -16,6 +16,7 @@ The simulation supports a variety of states of matter by representing the entire
 #### CPU demo scenes
 The following demo scenes are built in the CPU application, labeled with appropriate key commands to bring them up:
 
+  - *q* - A collapsing sand pile with an maneuverable digger shuffle
   - *1* - A collapsing sand pile demonstrating frictional effect on angle of repose
   - *2* - Stiff stacks of rigid bodies
   - *3* - Stable stacking of rigid bodies in the formation of a wall

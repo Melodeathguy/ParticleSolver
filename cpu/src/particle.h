@@ -131,6 +131,7 @@ struct Body
     QHash<int, SDFData> sdf; // map from global particles index to SDF data
     Constraint *shape;
     glm::dvec2 center; // center of mass
+    glm::dvec2 ccenter; // circumcenter
     double imass, angle; // total inverse mass
 
     void updateCOM(QList<Particle *> *estimates, bool useEstimates = true);

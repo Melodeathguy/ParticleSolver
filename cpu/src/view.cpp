@@ -17,7 +17,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
     fps = 60;
-    scale = 30;
+    scale = 50;
 
     // TODO: Make automatic!
     double screenHeight = 1050.;

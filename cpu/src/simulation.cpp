@@ -634,13 +634,15 @@ void Simulation::setColor(int body, float alpha)
 {
     int choice = abs(body) % 5;
     if (choice == 0) {
-        glColor4f(1,.7,0,alpha);
-    } else if (choice == 1) {
-        glColor4f(.35,.75,.95,alpha);
-    } else if (choice == 2) {
         glColor4f(1,.55,.8,alpha);
+    } else if (choice == 1) {
+        glColor4f(1,.7,0,alpha);
+    } else if (choice == 2) {
+glColor4f(.1,.85,.9,alpha);
+
     } else if (choice == 3) {
-        glColor4f(.1,.85,.9,alpha);
+
+        glColor4f(.35,.75,.95,alpha);
     } else {
         glColor4f(.1,.9,.6,alpha);
     }
@@ -1290,15 +1292,15 @@ void Simulation::initWreckingBall()
 
 void Simulation::initSandDigger()
 {
-    m_xBoundaries = glm::dvec2(-100,100);
-    m_yBoundaries = glm::dvec2(-5, 1000);
+    m_xBoundaries = glm::dvec2(-50,50);
+    m_yBoundaries = glm::dvec2(-50, 1000);
     m_gravity = glm::dvec2(0,-9.8);
 
 
 
     // Draw Digger Shuffle
     double pi = 3.14159265359;
-    double diggerRadius = 5.;
+    double diggerRadius = 10.;
     int diggerRings = 3;
     glm::dvec2 diggerPos = glm::dvec2(10., 10.);
 
@@ -1308,41 +1310,45 @@ void Simulation::initSandDigger()
 
     for(int r = 0; r < diggerRings; r++){
 
-        double ringRadius = diggerRadius + 2 * r * PARTICLE_RAD;
-        assemblyAngle = atan(2*PARTICLE_RAD / ringRadius);
+        double ringRadius = diggerRadius + r * PARTICLE_RAD;
+        assemblyAngle = atan(2*PARTICLE_RAD / ringRadius) / 2.0;
 
         for(double a = 0; a < pi; a += assemblyAngle){
             double xPos = ringRadius * cos(-a);
             double yPos = ringRadius * sin(-a);
-            //std::cout << xPos << ", " <<yPos << "\n";
-            data.append(SDFData(glm::normalize(glm::dvec2(xPos,yPos)), ringRadius));
-            Particle *part = new Particle(diggerPos + glm::dvec2(xPos, yPos), 5., SOLID);
 
-            //Particle(glm::dvec2(0, chainLength * 3 + 6) * PARTICLE_DIAM + glm::dvec2(0,2), 0, SOLID)
+            Particle *part = new Particle(diggerPos + glm::dvec2(xPos, yPos), 5., SOLID);
+            data.append(SDFData(glm::normalize(glm::dvec2(xPos,yPos)), ringRadius));
 
             part->sFriction = 1.;
             part->kFriction = 1.;
             vertices.append(part);
         }
     }
+
     Body *body = createRigidBody(&vertices, &data);
+    body->ccenter = diggerPos;
     vertices.clear();
 
+    double sandMass = 1;
 
-
-    for (int i = -15; i <= 15; i++) {
-        for (int j = 0; j < 30; j++) {
-            glm::dvec2 pos = glm::dvec2(i * (PARTICLE_DIAM + EPSILON), pow(j,1.2) * (PARTICLE_DIAM) + PARTICLE_RAD + m_yBoundaries.x);
-            Particle *part= new Particle(pos, 1, SOLID);
-            part->sFriction = .35;
-            part->kFriction = .3;
+    for (int i = -10; i <= 10; i++) {
+        for (int j = 0; j < 100; j++) {
+            double maxOffset = PARTICLE_RAD;
+            double xOffset = static_cast <double> (rand()) / (static_cast <double> (RAND_MAX/maxOffset));;
+            double xPos = 2 * i * (PARTICLE_DIAM) + xOffset;
+            double yPos = pow(j,1.2) * (PARTICLE_DIAM) + PARTICLE_RAD + m_yBoundaries.x;
+            glm::dvec2 pos = glm::dvec2(xPos, yPos);
+            Particle *part= new Particle(pos, sandMass, SOLID);
+            part->sFriction = .0;
+            part->kFriction = .10;
             m_particles.append(part);
         }
     }
 
-    Particle *jerk = new Particle(glm::dvec2(-25.55, 40), 100.f, SOLID);
-    jerk->v.x = 8.5;
-    m_particles.append(jerk);
+    //Particle *jerk = new Particle(glm::dvec2(-25.55, 40), 100.f, SOLID);
+    //jerk->v.x = 8.5;
+    //m_particles.append(jerk);
 }
 
 int Simulation::getNumParticles()
@@ -1365,7 +1371,6 @@ double Simulation::getKineticEnergy()
 void Simulation::mousePressed(const glm::dvec2 &p)
 {
     this->objectMoveMode = true;
-    //std::cout << "click : (" << p.x << "," << p.y << ")\n";
     this->mouseMoved(p);
 }
 
@@ -1380,17 +1385,16 @@ void Simulation::mouseMoved(const glm::dvec2 &p)
         Body * body = this->m_bodies.first();
         glm::dvec2 zeroVec = glm::dvec2(0., 0.);
 
-        std::cout << "particle size:" << body->particles.size() << "\n";
 
         for(int i = 0; i < body->particles.size(); i++){
             int particleId = body->particles.at(i);
             Particle * part = m_particles.at(particleId);
 
-            part->p = p - (body->center - part->p);
-            //std::cout << body->center.x << ", " << part->p.x << "\n";
+            part->p = p - (body->ccenter - part->p);
+            glm::dvec2 tmp = (body->ccenter - part->p);
             part->v = zeroVec;
         }
-        body->center = p;
+        body->ccenter = p;
     }
 }
 
@@ -1411,9 +1415,9 @@ void Simulation::mouseWheelMoved(double delta){
             int particleId = body->particles.at(i);
             Particle * part = m_particles.at(particleId);
             this->rigigBodyAngle = fmod(this->rigigBodyAngle + delta, 2*pi);
-            glm::dvec2 rotated = glm::rotate(body->center - part->p, delta);
+            glm::dvec2 rotated = glm::rotate(body->ccenter - part->p, delta);
 
-            part->p = body->center - rotated;
+            part->p = body->ccenter - rotated;
             part->v = zeroVec;
         }
     }
