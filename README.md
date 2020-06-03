@@ -16,7 +16,7 @@ The simulation supports a variety of states of matter by representing the entire
 #### CPU demo scenes
 The following demo scenes are built in the CPU application, labeled with appropriate key commands to bring them up:
 
-  - *q* - A collapsing sand pile with an maneuverable digger shuffle
+  - *Q* - A collapsing sand pile with an maneuverable digger shuffle
   - *1* - A collapsing sand pile demonstrating frictional effect on angle of repose
   - *2* - Stiff stacks of rigid bodies
   - *3* - Stable stacking of rigid bodies in the formation of a wall
@@ -35,6 +35,7 @@ The following demo scenes are built in the CPU application, labeled with appropr
   - *V* - A volcano erupting and settling
 
 The following commands may also be useful:
+  - *Tab* - Toggle velocity field rendering or regular rendering
   - *T* - Toggle real-time or time-step mode
   - *Space* - move forward by a time step during time-step mode
   - *R* - reset the simulation

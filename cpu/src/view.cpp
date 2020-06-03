@@ -25,6 +25,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
     aspect = screenWidth / screenHeight;
     tickTime = 0.0;
     timestepMode = true;
+    velocityRenderMode = false;
     current = FLUID_TEST;
 }
 
@@ -65,7 +66,12 @@ void View::paintGL()
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    sim.draw();
+    if (velocityRenderMode){
+        sim.drawVelocityField();
+    }
+    else{
+        sim.draw();
+    }
 
     glColor3f(1,1,1);
     renderText(10, 20, "FPS: " + QString::number((int) (fps)), this->font());
@@ -142,7 +148,7 @@ void View::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Space) tickTime = .01;
     if (event->key() == Qt::Key_Backspace) tickTime = -.01;
     if (event->key() == Qt::Key_C) sim.debug = !sim.debug;
-
+    if (event->key() == Qt::Key_Tab) velocityRenderMode = !velocityRenderMode;
 
     if (event->key() == Qt::Key_1) {
         current = GRANULAR_TEST;

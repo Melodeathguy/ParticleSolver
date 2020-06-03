@@ -21,6 +21,7 @@ private:
     double scale;
     double aspect;
     bool timestepMode;
+    bool velocityRenderMode;
 
     glm::ivec2 dimensions;
     Simulation sim;

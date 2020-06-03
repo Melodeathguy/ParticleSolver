@@ -74,6 +74,7 @@ public:
     // Basic interaction events
     void tick(double seconds);
     void draw();
+    void drawVelocityField();
     void resize(const glm::ivec2 &dim);
     void mousePressed(const glm::dvec2 &p);
     void mouseMoved(const glm::dvec2 &p);

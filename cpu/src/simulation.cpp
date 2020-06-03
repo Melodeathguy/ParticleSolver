@@ -485,6 +485,60 @@ void Simulation::draw()
     glEnd();
 }
 
+void Simulation::drawVelocityField()
+{
+
+    glColor3f(abs(m_gravity.x) / 10., abs(m_gravity.y) / 10., 0.);
+    glPushMatrix();
+    //glTranslatef(p->p.x, p->p.y, 0);
+    //glScalef(, PARTICLE_RAD, 0);
+    glRectf(-this->m_dimensions.x,-this->m_dimensions.y, this->m_dimensions.x, this->m_dimensions.y);
+    glEnd();
+    glPopMatrix();
+
+    for (int i = 0; i < m_particles.size(); i++) {
+        const Particle *p = m_particles[i];
+
+        glColor3f(abs(p->v.x) / 10., abs(p->v.y) / 10.,0);
+
+        /*
+        if (p->imass == 0.f) {
+            glColor3f(1,0,0);
+        } else if (p->ph == FLUID || p->ph == GAS){
+            glColor3f(0,p->bod / 100., 1-p->bod / 100.);
+        } else if (p->ph == SOLID) {
+            setColor(p->bod, 1);
+        } else {
+            glColor3f(0,0,1);
+        }
+        */
+
+        glPushMatrix();
+        glTranslatef(p->p.x, p->p.y, 0);
+        glScalef(PARTICLE_RAD * 2, PARTICLE_RAD * 2, 0);
+        drawCircle();
+        glPopMatrix();
+    }
+
+    glEnd();
+
+
+    /*
+    if (debug) {
+        drawParticles();
+    }
+    drawBodies();
+    drawGlobals();
+    drawSmoke();
+
+    glColor3f(1,1,1);
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    glVertex2f(m_point.x, m_point.y);
+    glEnd();
+    */
+}
+
 void Simulation::resize(const glm::ivec2 &dim)
 {
     m_dimensions = dim;
