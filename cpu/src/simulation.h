@@ -92,7 +92,7 @@ private:
     void clear();
 
     // Creation functions for different types of matter
-    Body *createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfData);
+    Body *createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfData, bool useGravity = true);
     TotalFluidConstraint *createFluid(QList<Particle *> *particles, double density);
     GasConstraint *createGas(QList<Particle *> *particles, double density, bool open);
     void createSmokeEmitter(glm::dvec2 posn, double particlesPerSec, GasConstraint *gs);

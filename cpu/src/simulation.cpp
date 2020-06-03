@@ -143,7 +143,10 @@ void Simulation::tick(double seconds)
 
         // (2) Apply forces
         glm::dvec2 myGravity = m_gravity;
-        if(p->ph == GAS) myGravity *= ALPHA;
+        if(p->ph == GAS) {
+            myGravity *= ALPHA;}
+        else if(p->bod != -1 && m_bodies.at(p->bod)->gravityResistance) {
+            myGravity = glm::dvec2(0.,0.);}
 //        for(OpenSmokeEmitter *e: m_emitters) {
 //            for(Particle *p: m_particles) {
 //                if(glm::distance(p->p, e->getPosn()) < 1) {
@@ -151,6 +154,7 @@ void Simulation::tick(double seconds)
 //                }
 //            }
 //        }
+
         p->v = p->v + seconds * myGravity + seconds * p->f;
         p->f = glm::dvec2();
 
@@ -370,7 +374,7 @@ void Simulation::tick(double seconds)
     m_counts = new int[m_particles.size()];
 }
 
-Body *Simulation::createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfData)
+Body *Simulation::createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfData, bool gravityResistance)
 {
     if(verts->size() <= 1) {
         cout << "Rigid bodies must be at least 2 points." << endl;
@@ -378,7 +382,8 @@ Body *Simulation::createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfD
     }
 
     // Compute the total mass, add all the particles to the system and the body
-    Body *body = new Body(); int offset = m_particles.size(), bodyIdx = m_bodies.size();
+    Body *body = new Body();
+    int offset = m_particles.size(), bodyIdx = m_bodies.size();
     double totalMass = 0.0;
     for (int i = 0; i < verts->size(); i++) {
         Particle *p = verts->at(i);
@@ -402,6 +407,7 @@ Body *Simulation::createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfD
     body->updateCOM(&m_particles, false);
     body->computeRs(&m_particles);
     body->shape = new TotalShapeConstraint(body);
+    body->gravityResistance = gravityResistance;
 
     m_bodies.append(body);
     return body;
@@ -1296,8 +1302,6 @@ void Simulation::initSandDigger()
     m_yBoundaries = glm::dvec2(-50, 1000);
     m_gravity = glm::dvec2(0,-9.8);
 
-
-
     // Draw Digger Shuffle
     double pi = 3.14159265359;
     double diggerRadius = 10.;
@@ -1326,7 +1330,7 @@ void Simulation::initSandDigger()
         }
     }
 
-    Body *body = createRigidBody(&vertices, &data);
+    Body *body = createRigidBody(&vertices, &data, true);
     body->ccenter = diggerPos;
     vertices.clear();
 
@@ -1393,7 +1397,6 @@ void Simulation::mouseMoved(const glm::dvec2 &p)
         if (vectorLength > maxOffsetDistance){
             aimVector /= vectorLength;
             aimVector *= maxOffsetDistance;
-            std::cout << aimVector.x << ", " << aimVector.y << "-3\n";
         }
         aimVector += body->ccenter;
 

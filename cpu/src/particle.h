@@ -133,6 +133,7 @@ struct Body
     glm::dvec2 center; // center of mass
     glm::dvec2 ccenter; // circumcenter
     double imass, angle; // total inverse mass
+    bool gravityResistance;
 
     void updateCOM(QList<Particle *> *estimates, bool useEstimates = true);
     void computeRs(QList<Particle *> *estimates);
