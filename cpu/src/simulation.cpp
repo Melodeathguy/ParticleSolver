@@ -1301,7 +1301,7 @@ void Simulation::initSandDigger()
     // Draw Digger Shuffle
     double pi = 3.14159265359;
     double diggerRadius = 10.;
-    int diggerRings = 3;
+    int diggerRings = 10;
     glm::dvec2 diggerPos = glm::dvec2(10., 10.);
 
     double assemblyAngle;
@@ -1380,21 +1380,31 @@ void Simulation::mouseMoved(const glm::dvec2 &p)
         return;
     }
 
+
     int noSolidObjects = this->m_bodies.size();
     if (noSolidObjects){
         Body * body = this->m_bodies.first();
         glm::dvec2 zeroVec = glm::dvec2(0., 0.);
 
+        double maxOffsetDistance = .1;
+
+        glm::dvec2 aimVector = p - body->ccenter;
+        double vectorLength = (double) glm::length(aimVector);
+        if (vectorLength > maxOffsetDistance){
+            aimVector /= vectorLength;
+            aimVector *= maxOffsetDistance;
+            std::cout << aimVector.x << ", " << aimVector.y << "-3\n";
+        }
+        aimVector += body->ccenter;
 
         for(int i = 0; i < body->particles.size(); i++){
             int particleId = body->particles.at(i);
             Particle * part = m_particles.at(particleId);
 
-            part->p = p - (body->ccenter - part->p);
-            glm::dvec2 tmp = (body->ccenter - part->p);
+            part->p = aimVector - (body->ccenter - part->p);
             part->v = zeroVec;
         }
-        body->ccenter = p;
+        body->ccenter = aimVector;
     }
 }
 
