@@ -14,6 +14,7 @@ INCLUDEPATH += src src/solver src/constraint glm
 DEPENDPATH += src src/solver src/constraint glm
 
 SOURCES += src/main.cpp \
+    src/animation.cpp \
     src/mainwindow.cpp \
     src/view.cpp \
     src/simulation.cpp \
@@ -33,6 +34,7 @@ SOURCES += src/main.cpp \
     src/fluidemitter.cpp
 
 HEADERS += src/mainwindow.h \
+    src/animation.h \
     src/view.h \
     src/simulation.h \
     src/particle.h \

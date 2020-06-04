@@ -116,6 +116,12 @@ void Simulation::init(SimulationType type)
 // (#) in the main simulation loop refer to lines from the main loop in the paper
 void Simulation::tick(double seconds)
 {
+
+    for (int i = 0; i < m_animations.length(); i++){
+        m_animations[i]->tick();
+    }
+
+
     QHash<ConstraintGroup, QList<Constraint *> > constraints;
 
     // Add all rigid body shape constraints
@@ -1387,6 +1393,15 @@ void Simulation::initSandDigger()
     Body *body = createRigidBody(&vertices, &data, true);
     body->ccenter = diggerPos;
     vertices.clear();
+
+    Animation *diggerAnimation = new Animation(body, &m_particles);
+    diggerAnimation->addRotationKeyframe(pi);
+    diggerAnimation->addKeyFrame(glm::dvec2(10., 10.));
+    diggerAnimation->addKeyFrame(glm::dvec2(0., 0.));
+    diggerAnimation->addRotationKeyframe(0);
+    diggerAnimation->addKeyFrame(glm::dvec2(-100., 100.));
+    diggerAnimation->addRotationKeyframe(pi);
+    m_animations.append(diggerAnimation);
 
     double sandMass = 1;
 

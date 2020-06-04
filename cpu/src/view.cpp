@@ -26,7 +26,8 @@ View::View(QWidget *parent) : QGLWidget(parent)
     tickTime = 0.0;
     timestepMode = true;
     velocityRenderMode = false;
-    current = FLUID_TEST;
+    current = SAND_DIGGER_TEST;
+    allowInteraction = false;
 }
 
 View::~View()
@@ -92,6 +93,8 @@ void View::resizeGL(int w, int h)
 
 void View::mousePressEvent(QMouseEvent *event)
 {
+    if (!allowInteraction) return;
+
     glm::dvec2 screen(event->x(), height() - event->y());
     glm::dvec2 aspectScale = glm::dvec2((double)(scale * aspect), (double) scale);
     glm::dvec2 world = (aspectScale * 2.) * (screen / glm::dvec2(width(), height())) - aspectScale;
@@ -100,19 +103,8 @@ void View::mousePressEvent(QMouseEvent *event)
 
 void View::mouseMoveEvent(QMouseEvent *event)
 {
-    /*
-    // This starter code implements mouse capture, which gives the change in
-    // mouse position since the last mouse movement. The mouse needs to be
-    // recentered after every movement because it might otherwise run into
-    // the edge of the screen, which would stop the user from moving further
-    // in that direction. Note that it is important to check that deltaX and
-    // deltaY are not zero before recentering the mouse, otherwise there will
-    // be an infinite loop of mouse move events.
-    int deltaX = event->x() - width() / 2;
-    int deltaY = event->y() - height() / 2;
-    if (!deltaX && !deltaY) return;
-//    QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
-    */
+    if (!allowInteraction) return;
+
     glm::dvec2 screen(event->x(), height() - event->y());
     glm::dvec2 aspectScale = glm::dvec2((double)(scale * aspect), (double) scale);
     glm::dvec2 world = (aspectScale * 2.) * (screen / glm::dvec2(width(), height())) - aspectScale;
@@ -121,6 +113,8 @@ void View::mouseMoveEvent(QMouseEvent *event)
 
 void View::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (!allowInteraction) return;
+
     glm::dvec2 screen(event->x(), height() - event->y());
     glm::dvec2 aspectScale = glm::dvec2((double)(scale * aspect), (double) scale);
     glm::dvec2 world = (aspectScale * 2.) * (screen / glm::dvec2(width(), height())) - aspectScale;
@@ -129,15 +123,16 @@ void View::mouseReleaseEvent(QMouseEvent *event)
 
 void View::wheelEvent(QWheelEvent *event)
 {
-    /*
-    if (event->delta() > 0) {
-        scale /= 1.2;
-    } else {
-        scale *= 1.2;
+    if (!allowInteraction) {
+        if (event->delta() > 0) {
+            scale /= 1.2;
+        } else {
+            scale *= 1.2;
+        }
+        sim.resize(glm::ivec2(scale, scale));
+        return;
     }
-    sim.resize(glm::ivec2(scale, scale));
-        */
-    sim.mouseWheelMoved(event->delta() / 1000.);
+    sim.mouseWheelMoved(event->delta() / 2000.);
 }
 
 void View::keyPressEvent(QKeyEvent *event)

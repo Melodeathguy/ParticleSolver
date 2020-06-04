@@ -6,6 +6,7 @@
 #include "opensmokeemitter.h"
 #include "solver.h"
 #include "fluidemitter.h"
+#include "animation.h"
 
 // Number of solver iterations per timestep
 #define SOLVER_ITERATIONS 3
@@ -118,6 +119,7 @@ private:
     QList<OpenSmokeEmitter *> m_smokeEmitters;
     QList<FluidEmitter *> m_fluidEmitters;
     QHash<ConstraintGroup, QList<Constraint *> > m_globalConstraints;
+    QList<Animation *> m_animations;
 
     // Solvers for regular and contact constraints
     Solver m_standardSolver;
