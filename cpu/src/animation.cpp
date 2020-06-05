@@ -4,9 +4,7 @@
 
 RotationKeyFrame::RotationKeyFrame(Body *body, QList<Particle *> *particles, double angle) : KeyFrame(body, particles), m_angle(angle) {};
 
-bool RotationKeyFrame::tick() const {
-
-    glm::dvec2 zeroVec = glm::dvec2(0., 0.);
+bool RotationKeyFrame::tick(double delta) const {
 
     double pi = 3.14159265359;
 
@@ -14,7 +12,6 @@ bool RotationKeyFrame::tick() const {
 
     double totalMoveAngle = abs(m_angle - m_body->angle);
 
-    // TODO bewegungswinkel begrenze
     if (totalMoveAngle < pi){
         dirFactor = -1;
     }
@@ -28,10 +25,9 @@ bool RotationKeyFrame::tick() const {
         int particleId = m_body->particles.at(i);
         Particle * part = m_particles->at(particleId);
         glm::dvec2 rotated = glm::rotate(m_body->ccenter - part->p, dirFactor * totalMoveAngle);
-
-        part->p = m_body->ccenter - rotated;
-        part->v = zeroVec;
+        part->v = ((m_body->ccenter - rotated)-part->p) / delta;
     }
+
 
     m_body->angle = fmod(m_body->angle + dirFactor * totalMoveAngle, 2*pi);
 
@@ -41,9 +37,8 @@ bool RotationKeyFrame::tick() const {
 
 PositionKeyFrame::PositionKeyFrame(Body *body, QList<Particle *> *particles, glm::dvec2 pos) : KeyFrame(body, particles), m_pos(pos) {};
 
-bool PositionKeyFrame::tick() const {
+bool PositionKeyFrame::tick(double delta) const {
 
-    glm::dvec2 zeroVec = glm::dvec2(0., 0.);
     bool reachedKeyframe = true;
 
     glm::dvec2 aimVector = m_pos - m_body->ccenter;
@@ -58,9 +53,7 @@ bool PositionKeyFrame::tick() const {
     for(int i = 0; i < m_body->particles.size(); i++){
         int particleId = m_body->particles.at(i);
         Particle * part = m_particles->at(particleId);
-
-        part->p = aimVector - (m_body->ccenter - part->p);
-        part->v = zeroVec;
+        part->v = ((aimVector - (m_body->ccenter - part->p)) - part->p) / delta;
     }
     m_body->ccenter = aimVector;
     return reachedKeyframe;
@@ -81,14 +74,14 @@ void Animation::addRotationKeyframe(double angle){
     m_keyFrames.push(kf);
 }
 
-bool Animation::tick(){
+bool Animation::tick(double delta){
 
     if (m_keyFrames.empty())
         return true;
 
     // process keyframe, if finished (= returns true) remove from list
-    m_keyFrames.front()->tick();
-    if (m_keyFrames.front()->tick()){
+    m_keyFrames.front()->tick(delta);
+    if (m_keyFrames.front()->tick(delta)){
         m_keyFrames.pop();
     }
 

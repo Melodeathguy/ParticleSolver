@@ -118,7 +118,7 @@ void Simulation::tick(double seconds)
 {
 
     for (int i = 0; i < m_animations.length(); i++){
-        m_animations[i]->tick();
+        m_animations[i]->tick(seconds);
     }
 
 
@@ -1366,7 +1366,7 @@ void Simulation::initSandDigger()
     double pi = 3.14159265359;
     double diggerRadius = 10.;
     int diggerRings = 10;
-    glm::dvec2 diggerPos = glm::dvec2(10., 10.);
+    glm::dvec2 diggerPos = glm::dvec2(25., 5.);
 
     double assemblyAngle;
     QList<Particle *> vertices;
@@ -1395,15 +1395,15 @@ void Simulation::initSandDigger()
     vertices.clear();
 
     Animation *diggerAnimation = new Animation(body, &m_particles);
-    diggerAnimation->addRotationKeyframe(pi);
-    diggerAnimation->addKeyFrame(glm::dvec2(10., 10.));
+    diggerAnimation->addRotationKeyframe(0);
+    diggerAnimation->addKeyFrame(glm::dvec2(25., 5.));
     diggerAnimation->addKeyFrame(glm::dvec2(0., 0.));
     diggerAnimation->addRotationKeyframe(0);
     diggerAnimation->addKeyFrame(glm::dvec2(-100., 100.));
     diggerAnimation->addRotationKeyframe(pi);
     m_animations.append(diggerAnimation);
 
-    double sandMass = 1;
+    double sandMass = 5;
 
     for (int i = -10; i <= 10; i++) {
         for (int j = 0; j < 100; j++) {

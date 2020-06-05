@@ -6,13 +6,13 @@
 #import <queue>
 
 
-#define MAX_STEP .05
+#define MAX_STEP .3
 #define MAX_ANGLE 0.01
 
 
 class KeyFrame{
 public:
-    virtual bool tick() const = 0;
+    virtual bool tick(double delta) const = 0;
     KeyFrame(Body *body, QList<Particle *> *particles) : m_body(body), m_particles(particles){};
 
 protected:
@@ -23,7 +23,7 @@ protected:
 class RotationKeyFrame : public KeyFrame{
 public:
     RotationKeyFrame(Body *body, QList<Particle *> *particles, double angle);
-    bool tick() const override;
+    bool tick(double delta) const override;
 
 private:
     double m_angle;
@@ -32,7 +32,7 @@ private:
 class PositionKeyFrame : public KeyFrame{
 public:
     PositionKeyFrame(Body *body, QList<Particle *> *particles, glm::dvec2 pos);
-    bool tick() const override;
+    bool tick(double delta) const override;
 
 private:
     glm::dvec2 m_pos;
@@ -48,7 +48,7 @@ public:
     void addKeyFrame(glm::dvec2 pos);
     void addRotationKeyframe(double angle);
 
-    bool tick();
+    bool tick(double delta);
 
 
 private:
