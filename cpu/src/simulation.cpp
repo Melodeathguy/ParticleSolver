@@ -411,6 +411,7 @@ Body *Simulation::createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfD
     // Update the body's global properties, including initial r_i vectors
     body->imass = 1.0 / totalMass;
     body->updateCOM(&m_particles, false);
+    body->updateCC(&m_particles);
     body->computeRs(&m_particles);
     body->shape = new TotalShapeConstraint(body);
     body->gravityResistance = gravityResistance;
@@ -1358,15 +1359,14 @@ void Simulation::initWreckingBall()
 
 void Simulation::initSandDigger()
 {
-    m_xBoundaries = glm::dvec2(-50,50);
-    m_yBoundaries = glm::dvec2(-50, 1000);
+    m_xBoundaries = glm::dvec2(-50, 50);
+    m_yBoundaries = glm::dvec2(-50, 50);
     m_gravity = glm::dvec2(0,-9.8);
 
     // Draw Digger Shuffle
-    double pi = 3.14159265359;
     double diggerRadius = 10.;
     int diggerRings = 10;
-    glm::dvec2 diggerPos = glm::dvec2(25., 5.);
+    glm::dvec2 diggerPos = glm::dvec2(0., 45.);
 
     double assemblyAngle;
     QList<Particle *> vertices;
@@ -1377,7 +1377,7 @@ void Simulation::initSandDigger()
         double ringRadius = diggerRadius + r * PARTICLE_RAD;
         assemblyAngle = atan(2*PARTICLE_RAD / ringRadius) / 2.0;
 
-        for(double a = 0; a < pi; a += assemblyAngle){
+        for(double a = 0; a < PI; a += assemblyAngle){
             double xPos = ringRadius * cos(-a);
             double yPos = ringRadius * sin(-a);
 
@@ -1392,21 +1392,57 @@ void Simulation::initSandDigger()
 
     Body *body = createRigidBody(&vertices, &data, true);
     body->ccenter = diggerPos;
+    body->setAngleReferencePoints(0, vertices.size()-1);
     vertices.clear();
 
+    int animationCycles = 100;
+    double padding = 5;
+
+    double xPos, yPos, xPos2;
+
     Animation *diggerAnimation = new Animation(body, &m_particles);
-    diggerAnimation->addRotationKeyframe(0);
-    diggerAnimation->addKeyFrame(glm::dvec2(25., 5.));
-    diggerAnimation->addKeyFrame(glm::dvec2(0., 0.));
-    diggerAnimation->addRotationKeyframe(0);
-    diggerAnimation->addKeyFrame(glm::dvec2(-100., 100.));
-    diggerAnimation->addRotationKeyframe(pi);
+    for(int i = 0; i < animationCycles; i++){
+
+
+        // add half a second delay
+        diggerAnimation->addDelay(1);
+
+        // move shuffle to a random point
+        xPos = urand(m_xBoundaries.x + padding + diggerRadius, m_xBoundaries.y - padding - diggerRadius);
+        yPos = urand(m_yBoundaries.x + padding + diggerRadius, m_yBoundaries.y - padding - diggerRadius);
+        diggerAnimation->addKeyFrame(glm::dvec2(xPos, yPos));
+
+        // turn shuffle to on loading position
+        xPos2 = urand(m_xBoundaries.x + padding + diggerRadius, m_xBoundaries.y - padding - diggerRadius);
+        yPos = m_yBoundaries.x + padding + diggerRadius;
+        if (xPos > xPos2){
+            diggerAnimation->addRotationKeyframe(PI / 2.);
+        } else{
+            diggerAnimation->addRotationKeyframe(PI + PI / 2.);
+        }
+
+        // move digger to some random point on baseline
+        diggerAnimation->addKeyFrame(glm::dvec2(xPos2, yPos));
+
+        // load the sand
+        diggerAnimation->addRotationKeyframe(0);
+
+        // move shuffle to another random point
+        xPos = urand(m_xBoundaries.x + padding + diggerRadius, m_xBoundaries.y - padding - diggerRadius);
+        yPos = urand(m_yBoundaries.x + padding + diggerRadius, m_yBoundaries.y - padding - diggerRadius);
+        diggerAnimation->addKeyFrame(glm::dvec2(xPos, yPos));
+
+        // unload sand
+        diggerAnimation->addRotationKeyframe(PI);
+
+
+    }
     m_animations.append(diggerAnimation);
 
     double sandMass = 5;
 
-    for (int i = -10; i <= 10; i++) {
-        for (int j = 0; j < 100; j++) {
+    for (int i = -45; i <= 45; i++) {
+        for (int j = 0; j < 70; j++) {
             double maxOffset = PARTICLE_RAD;
             double xOffset = static_cast <double> (rand()) / (static_cast <double> (RAND_MAX/maxOffset));;
             double xPos = 2 * i * (PARTICLE_DIAM) + xOffset;

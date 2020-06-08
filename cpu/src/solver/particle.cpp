@@ -56,6 +56,46 @@ void Body::updateCOM(QList<Particle *> *estimates, bool useEstimates)
     angle *= imass;
 }
 
+void Body::findCircumcenterPoints(QList<Particle *> *estimates, glm::dvec2 &ex1, glm::dvec2 &ex2){
+    // Recompute the circumcenter
+    double maxDist = 0.;
+    double dist;
+    for (int i = 0; i < particles.size(); i++) {
+        for (int j = 0; j < particles.size(); j++) {
+            if (i == j) continue;
+            Particle *p1 = estimates->at(particles.at(i));
+            Particle *p2 = estimates->at(particles.at(j));
+
+            dist = glm::length(p1->p - p2->p);
+
+            if (dist > maxDist){
+                ex1 = p1->p;
+                ex2 = p2->p;
+                maxDist = dist;
+            }
+        }
+    }
+}
+
+void Body::updateCC(QList<Particle *> *estimates)
+{
+    glm::dvec2 ex1, ex2;
+    findCircumcenterPoints(estimates, ex1, ex2);
+    ccenter = (ex1 + ex2) / 2.;
+}
+
+double Body::getAngle(QList<Particle *> *estimates){
+    glm::dvec2 circumAim = glm::normalize(estimates->at(angleRefIndex2)->p - estimates->at(angleRefIndex1)->p);
+    double angle = atan2(circumAim.y, circumAim.x);
+    angle = (angle >= 0 ? angle : (2*PI + angle));
+    return angle;
+}
+
+void Body::setAngleReferencePoints(int i1, int i2){
+    angleRefIndex1 = i1;
+    angleRefIndex1 = i2;
+}
+
 void Body::computeRs(QList<Particle *> *estimates)
 {
     imass = 0.0;

@@ -18,10 +18,11 @@ View::View(QWidget *parent) : QGLWidget(parent)
 
     fps = 60;
     scale = 50;
+    m_frameNo = 0;
 
     // TODO: Make automatic!
-    double screenHeight = 1050.;
-    double screenWidth = 1680.;
+    double screenHeight = 768;//1050.;
+    double screenWidth = 1366;//1680.;
     aspect = screenWidth / screenHeight;
     tickTime = 0.0;
     timestepMode = true;
@@ -205,6 +206,7 @@ void View::keyReleaseEvent(QKeyEvent *event)
 
 void View::tick()
 {
+
     // Get the number of seconds since the last tick (variable update rate)
     double seconds = time.restart() * 0.001;
     fps = .02 / seconds + .98 * fps;
@@ -215,9 +217,25 @@ void View::tick()
             tickTime = 0.0;
         }
     } else {
-        sim.tick(.01);
+        sim.tick(.01); // 10MS -> 100 FPS
+        m_frameNo += 1;
     }
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();
+
+    // TODO: make more beautiful
+    QString number = QString("%1").arg(m_frameNo, 8, 10, QChar('0'));
+    renderImage("/home/stahl/tmp/frame-" + number + ".jpg");
+
+
+}
+
+void View::renderImage(QString fileName){
+    //QPixmap image = QPixmap::grabWidget(this);
+    QPixmap image = renderPixmap();
+    if( !image.save( fileName, "JPG" ) )
+    {
+       std::cerr << "Error saving image." << std::endl;
+    }
 }

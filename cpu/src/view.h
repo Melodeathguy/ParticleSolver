@@ -28,6 +28,8 @@ private:
     Simulation sim;
     SimulationType current;
 
+    int m_frameNo;
+
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
@@ -40,6 +42,8 @@ private:
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+
+    void renderImage(QString fileName);
 
 private slots:
     void tick();

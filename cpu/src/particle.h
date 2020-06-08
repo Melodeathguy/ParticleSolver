@@ -134,9 +134,15 @@ struct Body
     glm::dvec2 ccenter; // circumcenter
     double imass, angle; // total inverse mass
     bool gravityResistance;
+    int angleRefIndex1 = 0, angleRefIndex2 = 1;
 
     void updateCOM(QList<Particle *> *estimates, bool useEstimates = true);
+    void updateCC(QList<Particle *> *estimates);
     void computeRs(QList<Particle *> *estimates);
+    double getAngle(QList<Particle *> *estimates);
+    void setAngleReferencePoints(int i1, int i2);
+    void findCircumcenterPoints(QList<Particle *> *estimates, glm::dvec2 &ex1, glm::dvec2 &ex2);
+
 };
 
 #endif // PARTICLE_H

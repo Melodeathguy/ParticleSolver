@@ -32,6 +32,7 @@ inline void printVec(const glm::dvec2 v) {
 }
 
 #define EPSILON .0001
+#define PI 3.14159265359
 
 #define D2R(d) (d * M_PI / 180)
 #define R2D(r) (r * 180 / M_PI)
