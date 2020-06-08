@@ -5,6 +5,8 @@
 
 #include <QTime>
 #include <QTimer>
+#include <QElapsedTimer>
+#include <QMutex>
 
 class View : public QGLWidget
 {
@@ -14,8 +16,9 @@ public:
     View(QWidget *parent);
     ~View();
 
+
 private:
-    QTime time;
+    QElapsedTimer time;
     QTimer timer;
     double fps, tickTime;
     double scale;
@@ -23,6 +26,9 @@ private:
     bool timestepMode;
     bool velocityRenderMode;
     bool allowInteraction;
+
+    QMutex *tickLock = new QMutex(QMutex::NonRecursive);
+    bool m_busy;
 
     glm::ivec2 dimensions;
     Simulation sim;

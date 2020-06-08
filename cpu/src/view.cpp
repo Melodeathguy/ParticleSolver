@@ -19,13 +19,14 @@ View::View(QWidget *parent) : QGLWidget(parent)
     fps = 60;
     scale = 50;
     m_frameNo = 0;
+    m_busy = false;
 
     // TODO: Make automatic!
     double screenHeight = 768;//1050.;
     double screenWidth = 1366;//1680.;
     aspect = screenWidth / screenHeight;
     tickTime = 0.0;
-    timestepMode = true;
+    timestepMode = false;
     velocityRenderMode = false;
     current = SAND_DIGGER_TEST;
     allowInteraction = false;
@@ -43,8 +44,9 @@ void View::initializeGL()
 
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
-    time.start();
-    timer.start(1000 / 60);
+    //time.start();
+    timer.start(1000 / 60.);
+
 
     // Center the mouse, which is explained more in mouseMoveEvent() below.
     // This needs to be done here because the mouse may be initially outside
@@ -52,7 +54,6 @@ void View::initializeGL()
     // events. This occurs if there are two monitors and the mouse is on the
     // secondary monitor.
 //    QCursor::setPos(mapToGlobal(QPoint(width() / 2, height() / 2)));
-
 }
 
 void View::paintGL()
@@ -76,7 +77,7 @@ void View::paintGL()
     }
 
     glColor3f(1,1,1);
-    renderText(10, 20, "FPS: " + QString::number((int) (fps)), this->font());
+    renderText(10, 20, "FPS: " + QString::number((double) (fps)), this->font());
     renderText(10, 40, "# Particles: " + QString::number(sim.getNumParticles()), this->font());
     renderText(10, 60, "Kinetic Energy: " + QString::number(sim.getKineticEnergy()), this->font());
 }
@@ -206,10 +207,24 @@ void View::keyReleaseEvent(QKeyEvent *event)
 
 void View::tick()
 {
+    bool stopping = false;
+    tickLock->lock();
+    if(m_busy){
+        stopping = true;
+    } else {
+        m_busy = true;
+    }
+    //tickLock->unlock();
+    if(stopping){return;}
+
 
     // Get the number of seconds since the last tick (variable update rate)
-    double seconds = time.restart() * 0.001;
-    fps = .02 / seconds + .98 * fps;
+    double seconds = time.elapsed();
+    time.start();
+
+    fps = 1000. / seconds;
+
+    std::cout << "FPS: " << fps << ", " << m_frameNo << ", "<<"\n";
 
     if (timestepMode) {
         if (tickTime != 0.0) {
@@ -228,7 +243,9 @@ void View::tick()
     QString number = QString("%1").arg(m_frameNo, 8, 10, QChar('0'));
     renderImage("/home/stahl/tmp/frame-" + number + ".jpg");
 
-
+    //tickLock->lock();
+    m_busy = false;
+    tickLock->unlock();
 }
 
 void View::renderImage(QString fileName){
