@@ -43,11 +43,13 @@ bool PlyExporter::writePoints(int step, QList<Particle *> particles, int diggerI
     stream << "property float y" << Qt::endl;
     stream << "property float angle" << Qt::endl;
 
-    stream << "element vertex " << particles.size()  << Qt::endl;
+    stream << "element vertex " << particles.size() - digger->particles.size() << Qt::endl;
     stream << "property float x" << Qt::endl;
     stream << "property float y" << Qt::endl;
+    stream << "property float z" << Qt::endl; // currently 3rd dimension not in use, set to constant
     stream << "property float xv" << Qt::endl;
     stream << "property float yv" << Qt::endl;
+    stream << "property float zv" << Qt::endl; // currently 3rd dimension not in use, set to constant
 
     stream << "end_header" << Qt::endl;
 
@@ -60,14 +62,10 @@ bool PlyExporter::writePoints(int step, QList<Particle *> particles, int diggerI
         if (part->bod == diggerId){
             continue;
         }
-        stream << part->p.x << " " << part->p.y << " " << part->v.x << " " << part->v.y << Qt::endl;
+        stream << part->p.x << " " << part->p.y << " " << 0 << " " << part->v.x << " " << part->v.y << " " << 0 << " " << Qt::endl;
     }
     m_file.close();
 
     return true;
 }
 
-
-QFile m_file;
-QTextStream m_stream;
-bool m_bigEndian;
