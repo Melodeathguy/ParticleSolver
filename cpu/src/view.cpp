@@ -8,7 +8,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
     setMouseTracking(true);
 
     // Hide the cursor since this is a fullscreen app
-//    setCursor(Qt::BlankCursor);
+    // setCursor(Qt::BlankCursor);
 
     // View needs keyboard focus
     setFocusPolicy(Qt::StrongFocus);
@@ -20,6 +20,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
     scale = 50;
     m_frameNo = 0;
     m_busy = false;
+    tickStep = 0.0111111111; // for 90 FPS video
 
     // TODO: Make automatic!
     double screenHeight = 768;//1050.;
@@ -235,7 +236,7 @@ void View::tick()
             tickTime = 0.0;
         }
     } else {
-        sim.tick(.01); // 10MS -> 100 FPS
+        sim.tick(tickStep); // 11.11MS -> 90 FPS
         m_frameNo += 1;
     }
 
