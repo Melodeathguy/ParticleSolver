@@ -30,10 +30,13 @@ View::View(QWidget *parent) : QGLWidget(parent)
     velocityRenderMode = false;
     current = SAND_DIGGER_TEST;
     allowInteraction = false;
+    exportSimulationData = true;
+    exporter = new PlyExporter("./export/");
 }
 
 View::~View()
 {
+    delete exporter;
 }
 
 void View::initializeGL()
@@ -246,6 +249,11 @@ void View::tick()
     //tickLock->lock();
     m_busy = false;
     tickLock->unlock();
+
+    if (exportSimulationData){
+        exporter->writePoints(m_frameNo, sim.m_particles, 0, sim.m_bodies.at(0));
+    }
+
 }
 
 void View::renderImage(QString fileName){

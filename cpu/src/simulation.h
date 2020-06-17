@@ -88,6 +88,15 @@ public:
     double getKineticEnergy();
     bool debug;
 
+
+    // Storage of global particles, rigid bodies, and general constraints
+    QList<Particle *> m_particles;
+    QList<Body *> m_bodies;
+    QList<OpenSmokeEmitter *> m_smokeEmitters;
+    QList<FluidEmitter *> m_fluidEmitters;
+    QHash<ConstraintGroup, QList<Constraint *> > m_globalConstraints;
+    QList<Animation *> m_animations;
+
 private:
 
     // Reset the simulation
@@ -112,14 +121,6 @@ private:
 
     // Counts for iterative particle solver
     int *m_counts;
-
-    // Storage of global particles, rigid bodies, and general constraints
-    QList<Particle *> m_particles;
-    QList<Body *> m_bodies;
-    QList<OpenSmokeEmitter *> m_smokeEmitters;
-    QList<FluidEmitter *> m_fluidEmitters;
-    QHash<ConstraintGroup, QList<Constraint *> > m_globalConstraints;
-    QList<Animation *> m_animations;
 
     // Solvers for regular and contact constraints
     Solver m_standardSolver;

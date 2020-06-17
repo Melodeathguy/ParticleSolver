@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QMutex>
+#include <utility/plyexporter.h>
 
 class View : public QGLWidget
 {
@@ -26,6 +27,8 @@ private:
     bool timestepMode;
     bool velocityRenderMode;
     bool allowInteraction;
+    bool exportSimulationData;
+    PlyExporter *exporter;
 
     QMutex *tickLock = new QMutex(QMutex::NonRecursive);
     bool m_busy;

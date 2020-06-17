@@ -16,6 +16,7 @@ DEPENDPATH += src src/solver src/constraint glm
 SOURCES += src/main.cpp \
     src/animation.cpp \
     src/mainwindow.cpp \
+    src/utility/plyexporter.cpp \
     src/view.cpp \
     src/simulation.cpp \
     src/constraint/distanceconstraint.cpp \
@@ -35,6 +36,7 @@ SOURCES += src/main.cpp \
 
 HEADERS += src/mainwindow.h \
     src/animation.h \
+    src/utility/plyexporter.h \
     src/view.h \
     src/simulation.h \
     src/particle.h \
