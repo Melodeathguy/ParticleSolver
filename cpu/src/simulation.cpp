@@ -153,7 +153,7 @@ void Simulation::tick(double seconds)
             myGravity *= ALPHA;}
         else if(p->bod != -1 && m_bodies.at(p->bod)->gravityResistance) {
             myGravity = glm::dvec2(0.,0.);}
-//        for(OpenSmokeEmitter *e: m_emitters) {
+//        for(OpenSmokeEmitter *: m_emitters) {
 //            for(Particle *p: m_particles) {
 //                if(glm::distance(p->p, e->getPosn()) < 1) {
 //                    p->f += glm::dvec2(0,.03);
@@ -180,6 +180,7 @@ void Simulation::tick(double seconds)
         Particle *p = m_particles[i];
 
         // (7) Find neighboring particles and solid contacts, naive solution
+        // TODO: 2D spatial hashing
         for (int j = i + 1; j < m_particles.size(); j++) {
             Particle *p2 = m_particles[j];
 
@@ -1372,12 +1373,16 @@ void Simulation::initSandDigger()
     QList<Particle *> vertices;
     QList<SDFData> data;
 
+    double angleOffsetGoingOut = 0.025;
+
     for(int r = 0; r < diggerRings; r++){
+
+        // TODO: schaufelkanten verändern
 
         double ringRadius = diggerRadius + r * PARTICLE_RAD;
         assemblyAngle = atan(2*PARTICLE_RAD / ringRadius) / 2.0;
 
-        for(double a = 0; a < PI; a += assemblyAngle){
+        for(double a = 0 + (diggerRings-r) * angleOffsetGoingOut; a < PI - (diggerRings-r) * angleOffsetGoingOut; a += assemblyAngle){
             double xPos = ringRadius * cos(-a);
             double yPos = ringRadius * sin(-a);
 
@@ -1439,7 +1444,7 @@ void Simulation::initSandDigger()
     }
     m_animations.append(diggerAnimation);
 
-    double sandMass = 5;
+    double sandMass = 5.;
 
     for (int i = -45; i <= 45; i++) {
         for (int j = 0; j < 70; j++) {
