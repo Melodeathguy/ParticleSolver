@@ -135,13 +135,21 @@ struct Body
     double imass, angle; // total inverse mass
     bool gravityResistance;
     int angleRefIndex1 = 0, angleRefIndex2 = 1;
+    float m_angleImpulseHint;
+    glm::dvec2 m_velocityHint;
 
     void updateCOM(QList<Particle *> *estimates, bool useEstimates = true);
     void updateCC(QList<Particle *> *estimates);
     void computeRs(QList<Particle *> *estimates);
-    double getAngle(QList<Particle *> *estimates);
+    float getAngle(QList<Particle *> *estimates);
     void setAngleReferencePoints(int i1, int i2);
     void findCircumcenterPoints(QList<Particle *> *estimates, glm::dvec2 &ex1, glm::dvec2 &ex2);
+
+    glm::dvec2 getVelocityHint();
+    void setVelocityHint(glm::dvec2 velocity);
+    float getAngleImpulseHint();
+    void setAngleImpulseHint(float angle);
+    void resetHints();
 
 };
 

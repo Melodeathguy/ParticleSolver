@@ -1,13 +1,14 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#import <particle.h>
-#import <glm.hpp>
-#import <queue>
+#include <particle.h>
+#include <glm.hpp>
+#include <queue>
+#include <memory>
+#include <cassert>
 
-
-#define MAX_STEP .1
-#define MAX_ANGLE 0.01
+#define MAX_STEP .2
+#define MAX_ANGLE 0.015
 
 
 class KeyFrame{
@@ -27,6 +28,7 @@ public:
 
 private:
     double m_angle;
+    bool m_done;
 };
 
 class PositionKeyFrame : public KeyFrame{

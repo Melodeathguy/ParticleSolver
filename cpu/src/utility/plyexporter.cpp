@@ -13,7 +13,7 @@ PlyExporter::PlyExporter(QString rootPath) :
 }
 
 
-bool PlyExporter::writePoints(int step, QList<Particle *> particles, int diggerId, Body *digger){
+bool PlyExporter::writePoints(int step, QList<Particle *> &particles, int diggerId, Body *digger, float borderRadius){
     m_filename = QDir(m_rootPath).filePath(QString("sand-%08d.ply").arg(step, 5, 10, QChar('0')));
     QFile m_file(m_filename);
     if (!m_file.open(QIODevice::ReadWrite)){
@@ -23,7 +23,7 @@ bool PlyExporter::writePoints(int step, QList<Particle *> particles, int diggerI
     QTextStream stream(&m_file);
 
     // writer header
-    stream << "ply" << Qt::endl;
+    stream << "ply" << endl;
 
     // TODO: Make writing to binary possibly!
     /*
@@ -34,35 +34,53 @@ bool PlyExporter::writePoints(int step, QList<Particle *> particles, int diggerI
     }
     */
 
-    stream << "format ascii 1.0" << Qt::endl;
+    stream << "format ascii 1.0" << endl;
 
-    stream << "comment Time " << step << Qt::endl;
+    stream << "comment Time " << step << endl;
 
-    stream << "element digger " << 1 << Qt::endl;
-    stream << "property float x" << Qt::endl;
-    stream << "property float y" << Qt::endl;
-    stream << "property float angle" << Qt::endl;
+    stream << "element digger " << 1 << endl;
+    stream << "property float x" << endl;
+    stream << "property float y" << endl;
+    stream << "property float xv" << endl;
+    stream << "property float yv" << endl;
+    stream << "property float a" << endl;
+    stream << "property float am" << endl;
 
-    stream << "element vertex " << particles.size() - digger->particles.size() << Qt::endl;
-    stream << "property float x" << Qt::endl;
-    stream << "property float y" << Qt::endl;
-    stream << "property float z" << Qt::endl; // currently 3rd dimension not in use, set to constant
-    stream << "property float xv" << Qt::endl;
-    stream << "property float yv" << Qt::endl;
-    stream << "property float zv" << Qt::endl; // currently 3rd dimension not in use, set to constant
+    stream << "element vertex " << particles.size() - digger->particles.size() << endl;
+    stream << "property float x" << endl;
+    stream << "property float y" << endl;
+    stream << "property float z" << endl; // currently 3rd dimension not in use, set to constant
+    stream << "property float xv" << endl;
+    stream << "property float yv" << endl;
+    stream << "property float zv" << endl; // currently 3rd dimension not in use, set to constant
 
-    stream << "end_header" << Qt::endl;
+    stream << "end_header" << endl;
 
-    stream << digger->ccenter.x << " " << digger->ccenter.y << " " << digger->angle << Qt::endl;
+    float dx, dy, dvx, dvy, da, dam;
+    dx = digger->ccenter.x / borderRadius;
+    dy = digger->ccenter.y / borderRadius;
+    dvx = digger->getVelocityHint().x / borderRadius;
+    dvy = digger->getVelocityHint().y / borderRadius;
+    da = digger->getAngle(&particles);
+    dam = digger->getAngleImpulseHint();
+
+    stream << dx << " " << dy << " " << dvx << " " << dvy << " " << da << " " << dam <<endl;
+    //std::cout << dx << " " << dy << " " << dvx << " " << dvy << " " << da << " " << dam <<endl;
 
     Particle *part;
+    float x, y, vx, vy;
     for (int i = 0; i < particles.size(); i++){
         // case particle belongs to digger
         part = particles.at(i);
         if (part->bod == diggerId){
             continue;
         }
-        stream << part->p.x << " " << part->p.y << " " << 0 << " " << part->v.x << " " << part->v.y << " " << 0 << " " << Qt::endl;
+        x = part->p.x / borderRadius;
+        y = part->p.y / borderRadius;
+        vx = part->v.x / borderRadius;
+        vy = part->v.y / borderRadius;
+
+        stream << x << " " << y << " " << 0 << " " << vx << " " << vy << " " << 0 << " " << endl;
     }
     m_file.close();
 

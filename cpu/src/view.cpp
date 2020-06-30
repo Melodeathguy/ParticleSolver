@@ -22,6 +22,9 @@ View::View(QWidget *parent) : QGLWidget(parent)
     m_busy = false;
     tickStep = 0.0111111111; // for 90 FPS video
 
+
+    srand(std::time(0));
+
     // TODO: Make automatic!
     double screenHeight = 768;//1050.;
     double screenWidth = 1366;//1680.;
@@ -224,11 +227,22 @@ void View::tick()
 
     // Get the number of seconds since the last tick (variable update rate)
     double seconds = time.elapsed();
+
+    // Trigger animations, hint methods in the animated body is called. Hints are reset at the simulation loop end.
+    for (int i = 0; i < sim.m_animations.length(); i++){
+        sim.m_animations[i]->tick(tickStep);
+    }
+
+    // The exporter uses hints, set by the animations to write the commands
+    if (exportSimulationData){
+        exporter->writePoints(m_frameNo, sim.m_particles, 0, sim.m_bodies.at(0));
+    }
+
     time.start();
 
     fps = 1000. / seconds;
 
-    std::cout << "FPS: " << fps << ", " << m_frameNo << ", "<<"\n";
+    //std::cout << "FPS: " << fps << ", " << m_frameNo << ", "<<"\n";
 
     if (timestepMode) {
         if (tickTime != 0.0) {
@@ -250,10 +264,6 @@ void View::tick()
     //tickLock->lock();
     m_busy = false;
     tickLock->unlock();
-
-    if (exportSimulationData){
-        exporter->writePoints(m_frameNo, sim.m_particles, 0, sim.m_bodies.at(0));
-    }
 
 }
 

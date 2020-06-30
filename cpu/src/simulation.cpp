@@ -117,11 +117,6 @@ void Simulation::init(SimulationType type)
 void Simulation::tick(double seconds)
 {
 
-    for (int i = 0; i < m_animations.length(); i++){
-        m_animations[i]->tick(seconds);
-    }
-
-
     QHash<ConstraintGroup, QList<Constraint *> > constraints;
 
     // Add all rigid body shape constraints
@@ -379,6 +374,11 @@ void Simulation::tick(double seconds)
     }
     delete[] m_counts;
     m_counts = new int[m_particles.size()];
+
+    for (int i = 0; i < m_bodies.size(); i++) {
+        m_bodies[i]->resetHints();
+    }
+
 }
 
 Body *Simulation::createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfData, bool gravityResistance)
@@ -1375,9 +1375,9 @@ void Simulation::initSandDigger()
 
     double angleOffsetGoingOut = 0.025;
 
-    for(int r = 0; r < diggerRings; r++){
+    int refIdx1, refIdx2;
 
-        // TODO: schaufelkanten verändern
+    for(int r = 0; r < diggerRings; r++){
 
         double ringRadius = diggerRadius + r * PARTICLE_RAD;
         assemblyAngle = atan(2*PARTICLE_RAD / ringRadius) / 2.0;
@@ -1393,14 +1393,19 @@ void Simulation::initSandDigger()
             part->kFriction = 1.;
             vertices.append(part);
         }
+        // Set the most outer points of the first constructed ring as reference points, so that a body angle can be calculated
+        if(r==0){
+            refIdx1 = 0;
+            refIdx2 = vertices.size() - 1;
+        }
     }
 
     Body *body = createRigidBody(&vertices, &data, true);
     body->ccenter = diggerPos;
-    body->setAngleReferencePoints(0, vertices.size()-1);
+    body->setAngleReferencePoints(refIdx1, refIdx2);
     vertices.clear();
 
-    int animationCycles = 100;
+    int animationCycles = 10000;
     double padding = 5;
 
     double xPos, yPos, xPos2;
@@ -1421,9 +1426,9 @@ void Simulation::initSandDigger()
         xPos2 = urand(m_xBoundaries.x + padding + diggerRadius, m_xBoundaries.y - padding - diggerRadius);
         yPos = m_yBoundaries.x + padding + diggerRadius;
         if (xPos > xPos2){
-            diggerAnimation->addRotationKeyframe(PI / 2.);
+            diggerAnimation->addRotationKeyframe(PI / 2.); // TODO: check
         } else{
-            diggerAnimation->addRotationKeyframe(PI + PI / 2.);
+            diggerAnimation->addRotationKeyframe(- PI / 2.);
         }
 
         // move digger to some random point on baseline
@@ -1439,8 +1444,7 @@ void Simulation::initSandDigger()
 
         // unload sand
         diggerAnimation->addRotationKeyframe(PI);
-
-
+        diggerAnimation->addDelay(0.8);
     }
     m_animations.append(diggerAnimation);
 

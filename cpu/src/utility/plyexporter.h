@@ -1,11 +1,10 @@
 #ifndef PLYEXPORTER_H
 #define PLYEXPORTER_H
 
-#import <qstring.h>
-#import <qfile.h>
-#import <qtextstream.h>
-#import <particle.h>
-#import <qdir.h>
+#include <QDir>
+#include <QTextStream>
+#include <iostream>
+#include <particle.h>
 
 /*
 bool isBigEndian(void)
@@ -27,7 +26,7 @@ public:
     ~PlyExporter(){};
 
 
-    bool writePoints(int step, QList<Particle *> particles, int diggerId, Body *digger);
+    bool writePoints(int step, QList<Particle *> &particles, int diggerId, Body *digger, float borderRadius = 50);
 
 
 
