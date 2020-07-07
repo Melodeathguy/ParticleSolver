@@ -84,11 +84,11 @@ void Body::updateCC(QList<Particle *> *estimates)
     ccenter = (ex1 + ex2) / 2.;
 }
 
-double Body::getAngle(QList<Particle *> *estimates){
+float Body::getAngle(QList<Particle *> *estimates){
     glm::dvec2 circumAim = glm::normalize(estimates->at(angleRefIndex2)->p - estimates->at(angleRefIndex1)->p);
-    double angle = atan2(circumAim.y, circumAim.x);
-    angle = (angle >= 0 ? angle : (2*PI + angle));
-    return angle;
+    float angle = atan2(circumAim.y, circumAim.x);
+    //angle = (angle >= 0 ? angle : (2*PI + angle));
+    return angle; //[-pi, pi]
 }
 
 void Body::setAngleReferencePoints(int i1, int i2){
@@ -110,4 +110,25 @@ void Body::computeRs(QList<Particle *> *estimates)
         }
     }
     imass = 1.0 / imass;
+}
+
+void Body::setVelocityHint(glm::dvec2 velocity){
+    m_velocityHint = velocity;
+}
+
+void Body::setAngleImpulseHint(float angle){
+    m_angleImpulseHint = angle;
+}
+
+void Body::resetHints(){
+    m_angleImpulseHint = 0;
+    m_velocityHint = glm::dvec2(0.,0.);
+}
+
+float Body::getAngleImpulseHint(){
+    return m_angleImpulseHint;
+}
+
+glm::dvec2 Body::getVelocityHint(){
+    return m_velocityHint;
 }
