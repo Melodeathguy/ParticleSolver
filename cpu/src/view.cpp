@@ -87,6 +87,7 @@ void View::paintGL()
     renderText(10, 20, "FPS: " + QString::number((double) (fps)), this->font());
     renderText(10, 40, "# Particles: " + QString::number(sim.getNumParticles()), this->font());
     renderText(10, 60, "Kinetic Energy: " + QString::number(sim.getKineticEnergy()), this->font());
+    renderText(10, 80, "Frame #: " + QString::number(m_frameNo), this->font());
 }
 
 void View::resizeGL(int w, int h)
@@ -258,8 +259,8 @@ void View::tick()
     update();
 
     // TODO: make more beautiful
-    QString number = QString("%1").arg(m_frameNo, 8, 10, QChar('0'));
-    renderImage("/home/stahl/tmp/frame-" + number + ".jpg");
+    QString number = QString("%1").arg(m_frameNo, 20, 10, QChar('0'));
+    renderImage("/home/stahl/tmp/frame"+ number +".jpg");
 
     //tickLock->lock();
     m_busy = false;

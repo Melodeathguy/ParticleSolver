@@ -6,19 +6,21 @@ resolution = (1680, 1050)
 
 def main(root):
     
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    writer = cv2.VideoWriter('output.avi', fourcc, 100.0, resolution)
+    fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+    writer = cv2.VideoWriter('output.avi', fourcc, 60, resolution)
     
     images = sorted([os.path.join(root, img) for img in os.listdir(root)])
     
     for i_path in images:
         img = cv2.imread(i_path)
+        
+        img = cv2.resize(img, None, fx=.5, fy=.5)
+        
         writer.write(img)
         
         cv2.imshow("pp", img)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            writer.release()
             break
         
     writer.release()
