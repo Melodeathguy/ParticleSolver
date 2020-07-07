@@ -117,11 +117,6 @@ void Simulation::init(SimulationType type)
 void Simulation::tick(double seconds)
 {
 
-    for (int i = 0; i < m_animations.length(); i++){
-        m_animations[i]->tick(seconds);
-    }
-
-
     QHash<ConstraintGroup, QList<Constraint *> > constraints;
 
     // Add all rigid body shape constraints
@@ -379,6 +374,11 @@ void Simulation::tick(double seconds)
     }
     delete[] m_counts;
     m_counts = new int[m_particles.size()];
+
+    for (int i = 0; i < m_bodies.size(); i++) {
+        m_bodies[i]->resetHints();
+    }
+
 }
 
 Body *Simulation::createRigidBody(QList<Particle *> *verts, QList<SDFData> *sdfData, bool gravityResistance)
@@ -1360,14 +1360,15 @@ void Simulation::initWreckingBall()
 
 void Simulation::initSandDigger()
 {
-    m_xBoundaries = glm::dvec2(-50, 50);
-    m_yBoundaries = glm::dvec2(-50, 50);
+    m_xBoundaries = glm::dvec2(-25, 25);
+    m_yBoundaries = glm::dvec2(-25, 25);
     m_gravity = glm::dvec2(0,-9.8);
 
     // Draw Digger Shuffle
-    double diggerRadius = 10.;
-    int diggerRings = 10;
-    glm::dvec2 diggerPos = glm::dvec2(0., 45.);
+    double diggerRadius = 8.;
+    double ringRadius;
+    int diggerRings = 7;
+    glm::dvec2 diggerPos = glm::dvec2(0., 24.);
 
     double assemblyAngle;
     QList<Particle *> vertices;
@@ -1375,11 +1376,11 @@ void Simulation::initSandDigger()
 
     double angleOffsetGoingOut = 0.025;
 
+    int refIdx1, refIdx2;
+
     for(int r = 0; r < diggerRings; r++){
 
-        // TODO: schaufelkanten verändern
-
-        double ringRadius = diggerRadius + r * PARTICLE_RAD;
+        ringRadius = diggerRadius + r * PARTICLE_RAD;
         assemblyAngle = atan(2*PARTICLE_RAD / ringRadius) / 2.0;
 
         for(double a = 0 + (diggerRings-r) * angleOffsetGoingOut; a < PI - (diggerRings-r) * angleOffsetGoingOut; a += assemblyAngle){
@@ -1393,65 +1394,72 @@ void Simulation::initSandDigger()
             part->kFriction = 1.;
             vertices.append(part);
         }
+        // Set the most outer points of the first constructed ring as reference points, so that a body angle can be calculated
+        if(r==0){
+            refIdx1 = 0;
+            refIdx2 = vertices.size() - 1;
+        }
     }
 
     Body *body = createRigidBody(&vertices, &data, true);
     body->ccenter = diggerPos;
-    body->setAngleReferencePoints(0, vertices.size()-1);
+    body->setAngleReferencePoints(refIdx1, refIdx2);
     vertices.clear();
 
-    int animationCycles = 100;
-    double padding = 5;
+    int animationCycles = 1000000;
+    double padding = 2.;
 
-    double xPos, yPos, xPos2;
+    double xPos = diggerPos.x;
+    double yPos = diggerPos.y;
+    double randFloat;
+    double floatRandomAngle;
+    int cutAfter;
+    double aimX, aimY;
+    double nextPointFrame = 5.;
 
+    double spaceLeft =     m_xBoundaries.x + padding + ringRadius;
+    double spaceRight =    m_xBoundaries.y - padding - ringRadius;
+    double spaceTop =      m_yBoundaries.y - padding - ringRadius;
+    double spaceBottom =   m_yBoundaries.x + padding + ringRadius;
+
+    std::cout << spaceLeft << ", " << spaceRight << ", " << spaceBottom << ", " << spaceTop << "\n";
     Animation *diggerAnimation = new Animation(body, &m_particles);
+
+    diggerAnimation->addDelay(5);
+
+
+
     for(int i = 0; i < animationCycles; i++){
 
+        randFloat = urand(0, 100);
+        cutAfter = (int) urand(1, 25);
 
-        // add half a second delay
-        diggerAnimation->addDelay(1);
-
-        // move shuffle to a random point
-        xPos = urand(m_xBoundaries.x + padding + diggerRadius, m_xBoundaries.y - padding - diggerRadius);
-        yPos = urand(m_yBoundaries.x + padding + diggerRadius, m_yBoundaries.y - padding - diggerRadius);
-        diggerAnimation->addKeyFrame(glm::dvec2(xPos, yPos));
-
-        // turn shuffle to on loading position
-        xPos2 = urand(m_xBoundaries.x + padding + diggerRadius, m_xBoundaries.y - padding - diggerRadius);
-        yPos = m_yBoundaries.x + padding + diggerRadius;
-        if (xPos > xPos2){
-            diggerAnimation->addRotationKeyframe(PI / 2.);
-        } else{
-            diggerAnimation->addRotationKeyframe(PI + PI / 2.);
+        if (randFloat < 40){
+            // move shuffle to a random point
+            aimX = urand(spaceLeft, spaceRight);
+            aimY = urand(spaceBottom, spaceTop);
+            xPos = aimX;
+            yPos = aimY;
+            diggerAnimation->addKeyFrame(glm::dvec2(xPos, yPos), cutAfter);
+        } else if(randFloat < 80){
+            // turn shuffle to a certain angle
+            floatRandomAngle = urand(-PI, PI);
+            diggerAnimation->addRotationKeyframe(floatRandomAngle, cutAfter);
+        } else {
+            diggerAnimation->addDelay(0.2, cutAfter);
         }
-
-        // move digger to some random point on baseline
-        diggerAnimation->addKeyFrame(glm::dvec2(xPos2, yPos));
-
-        // load the sand
-        diggerAnimation->addRotationKeyframe(0);
-
-        // move shuffle to another random point
-        xPos = urand(m_xBoundaries.x + padding + diggerRadius, m_xBoundaries.y - padding - diggerRadius);
-        yPos = urand(m_yBoundaries.x + padding + diggerRadius, m_yBoundaries.y - padding - diggerRadius);
-        diggerAnimation->addKeyFrame(glm::dvec2(xPos, yPos));
-
-        // unload sand
-        diggerAnimation->addRotationKeyframe(PI);
-
 
     }
     m_animations.append(diggerAnimation);
 
     double sandMass = 5.;
 
-    for (int i = -45; i <= 45; i++) {
-        for (int j = 0; j < 70; j++) {
+    for (int i = -24; i <= 24; i++) {
+        for (int j = 0; j < 83; j++) {
             double maxOffset = PARTICLE_RAD;
             double xOffset = static_cast <double> (rand()) / (static_cast <double> (RAND_MAX/maxOffset));;
             double xPos = 2 * i * (PARTICLE_DIAM) + xOffset;
-            double yPos = pow(j,1.2) * (PARTICLE_DIAM) + PARTICLE_RAD + m_yBoundaries.x;
+            double yPos = pow(j,0.99) * (PARTICLE_DIAM) + PARTICLE_RAD + m_yBoundaries.x;
             glm::dvec2 pos = glm::dvec2(xPos, yPos);
             Particle *part= new Particle(pos, sandMass, SOLID);
             part->sFriction = .0;
@@ -1459,10 +1467,6 @@ void Simulation::initSandDigger()
             m_particles.append(part);
         }
     }
-
-    //Particle *jerk = new Particle(glm::dvec2(-25.55, 40), 100.f, SOLID);
-    //jerk->v.x = 8.5;
-    //m_particles.append(jerk);
 }
 
 int Simulation::getNumParticles()
