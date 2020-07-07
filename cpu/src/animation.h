@@ -14,16 +14,22 @@
 class KeyFrame{
 public:
     virtual bool tick(double delta) = 0;
-    KeyFrame(Body *body, QList<Particle *> *particles) : m_body(body), m_particles(particles){};
+    KeyFrame(Body *body, QList<Particle *> *particles, int cutAfter) : m_body(body), m_particles(particles), m_cutAfter(cutAfter), m_stepCounter(0){};
+
+    void increaseStepCounter(){
+        m_stepCounter += 1;
+    }
 
 protected:
     Body *m_body;
     QList<Particle *> *m_particles;
+    int m_cutAfter;
+    int m_stepCounter;
 };
 
 class RotationKeyFrame : public KeyFrame{
 public:
-    RotationKeyFrame(Body *body, QList<Particle *> *particles, double angle);
+    RotationKeyFrame(Body *body, QList<Particle *> *particles, double angle, int cutAfter);
     bool tick(double delta) override;
 
 private:
@@ -33,7 +39,7 @@ private:
 
 class PositionKeyFrame : public KeyFrame{
 public:
-    PositionKeyFrame(Body *body, QList<Particle *> *particles, glm::dvec2 pos);
+    PositionKeyFrame(Body *body, QList<Particle *> *particles, glm::dvec2 pos, int cutAfter);
     bool tick(double delta) override;
 
 private:
@@ -42,7 +48,7 @@ private:
 
 class DelayKeyFrame : public KeyFrame{
 public:
-    DelayKeyFrame(double seconds);
+    DelayKeyFrame(double seconds, int cutAfter);
     bool tick(double delta) override;
 
 private:
@@ -56,9 +62,9 @@ class Animation
 public:
     Animation(Body *, QList<Particle *> *particles);
 
-    void addKeyFrame(glm::dvec2 pos);
-    void addRotationKeyframe(double angle);
-    void addDelay(double seconds);
+    void addKeyFrame(glm::dvec2 pos, int cutAfter = -1);
+    void addRotationKeyframe(double angle, int cutAfter = -1);
+    void addDelay(double seconds, int cutAfter = -1);
 
     bool tick(double delta);
 

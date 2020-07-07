@@ -26,7 +26,7 @@ public:
     ~PlyExporter(){};
 
 
-    bool writePoints(int step, QList<Particle *> &particles, int diggerId, Body *digger, float borderRadius = 50);
+    bool writePoints(int step, QList<Particle *> &particles, int diggerId, Body *digger, float borderRadius = 25);
 
 
 

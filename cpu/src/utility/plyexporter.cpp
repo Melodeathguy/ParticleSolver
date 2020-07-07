@@ -14,7 +14,7 @@ PlyExporter::PlyExporter(QString rootPath) :
 
 
 bool PlyExporter::writePoints(int step, QList<Particle *> &particles, int diggerId, Body *digger, float borderRadius){
-    m_filename = QDir(m_rootPath).filePath(QString("sand-%08d.ply").arg(step, 5, 10, QChar('0')));
+    m_filename = QDir(m_rootPath).filePath(QString("sand-%1.ply").arg(step, 10, 10, QChar('0')));
     QFile m_file(m_filename);
     if (!m_file.open(QIODevice::ReadWrite)){
         std::cout << "Error opening file: " << m_filename.toStdString() << std::endl;

@@ -1,20 +1,27 @@
 #include "animation.h"
 
 
-DelayKeyFrame::DelayKeyFrame(double seconds) : KeyFrame(0, 0), m_seconds(0.), m_targetSeconds(seconds) {};
+DelayKeyFrame::DelayKeyFrame(double seconds, int cutAfter) : KeyFrame(0, 0, cutAfter), m_seconds(0.), m_targetSeconds(seconds) {};
 
 bool DelayKeyFrame::tick(double delta) {
+    if (m_cutAfter > 0 && m_stepCounter >= m_cutAfter){
+        return true;
+    }
+    increaseStepCounter();
     return (m_seconds += delta) >= m_targetSeconds;
 }
 
 
-RotationKeyFrame::RotationKeyFrame(Body *body, QList<Particle *> *particles, double angle) : KeyFrame(body, particles), m_angle(angle), m_done(false) {};
+RotationKeyFrame::RotationKeyFrame(Body *body, QList<Particle *> *particles, double angle, int cutAfter) : KeyFrame(body, particles, cutAfter), m_angle(angle), m_done(false) {};
 
 bool RotationKeyFrame::tick(double delta) {
+    if (m_cutAfter > 0 && m_stepCounter >= m_cutAfter){
+        m_done = true;
+    }
 
     double pi = 3.14159265359;
 
-    // reached target state last step, setting digger particle's velocity back to 0
+    // reached targ  et state last step, setting digger particle's velocity back to 0
     if (m_done){
         glm::dvec2 zeroVec = glm::dvec2(0.,0.);
         for(int i = 0; i < m_body->particles.size(); i++){
@@ -22,6 +29,7 @@ bool RotationKeyFrame::tick(double delta) {
             Particle * part = m_particles->at(particleId);
             part->v = zeroVec;
         }
+        increaseStepCounter();
         return true;
     }
 
@@ -68,14 +76,17 @@ bool RotationKeyFrame::tick(double delta) {
         glm::dvec2 rotated = glm::rotate(m_body->ccenter - part->p, angleImpulse);
         part->v = ((m_body->ccenter - rotated)-part->p) / delta;
     }
-
+    increaseStepCounter();
     return false;
 }
 
 
-PositionKeyFrame::PositionKeyFrame(Body *body, QList<Particle *> *particles, glm::dvec2 pos) : KeyFrame(body, particles), m_pos(pos) {};
+PositionKeyFrame::PositionKeyFrame(Body *body, QList<Particle *> *particles, glm::dvec2 pos, int cutAfter) : KeyFrame(body, particles, cutAfter), m_pos(pos) {};
 
 bool PositionKeyFrame::tick(double delta) {
+    if (m_cutAfter > 0 && m_stepCounter >= m_cutAfter){
+        return true;
+    }
 
     bool reachedKeyframe = true;
 
@@ -100,7 +111,7 @@ bool PositionKeyFrame::tick(double delta) {
         Particle * part = m_particles->at(particleId);
         part->v = ((aimVector - (m_body->ccenter - part->p)) - part->p) / delta;
     }
-
+    increaseStepCounter();
     return reachedKeyframe;
 }
 
@@ -109,18 +120,18 @@ bool PositionKeyFrame::tick(double delta) {
 Animation::Animation(Body *body, QList<Particle *> *particles) : m_body(body), m_particles(particles) {}
 
 
-void Animation::addKeyFrame(glm::dvec2 pos){
-    std::shared_ptr<KeyFrame> kf = std::make_shared<PositionKeyFrame>(m_body, m_particles, pos);
+void Animation::addKeyFrame(glm::dvec2 pos, int cutAfter){
+    std::shared_ptr<KeyFrame> kf = std::make_shared<PositionKeyFrame>(m_body, m_particles, pos, cutAfter);
     m_keyFrames.push(kf);
 }
 
-void Animation::addRotationKeyframe(double angle){
-    std::shared_ptr<KeyFrame> kf = std::make_shared<RotationKeyFrame>(m_body, m_particles, angle);
+void Animation::addRotationKeyframe(double angle, int cutAfter){
+    std::shared_ptr<KeyFrame> kf = std::make_shared<RotationKeyFrame>(m_body, m_particles, angle, cutAfter);
     m_keyFrames.push(kf);
 }
 
-void Animation::addDelay(double seconds){
-    std::shared_ptr<KeyFrame> kf = std::make_shared<DelayKeyFrame>(seconds);
+void Animation::addDelay(double seconds, int cutAfter){
+    std::shared_ptr<KeyFrame> kf = std::make_shared<DelayKeyFrame>(seconds, cutAfter);
     m_keyFrames.push(kf);
 }
 
