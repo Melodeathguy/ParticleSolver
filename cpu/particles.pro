@@ -14,7 +14,8 @@ INCLUDEPATH += src src/solver src/constraint glm
 DEPENDPATH += src src/solver src/constraint glm
 
 SOURCES += src/main.cpp \
-    src/animation.cpp \
+    src/animation/animation.cpp \
+    src/animation/keyframe.cpp \
     src/mainwindow.cpp \
     src/utility/plyexporter.cpp \
     src/view.cpp \
@@ -35,7 +36,8 @@ SOURCES += src/main.cpp \
     src/fluidemitter.cpp
 
 HEADERS += src/mainwindow.h \
-    src/animation.h \
+    src/animation/animation.h \
+    src/animation/keyframe.h \
     src/utility/plyexporter.h \
     src/view.h \
     src/simulation.h \

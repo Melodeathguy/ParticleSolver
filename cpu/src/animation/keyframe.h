@@ -1,15 +1,13 @@
-#ifndef ANIMATION_H
-#define ANIMATION_H
+#ifndef KEYFRAME_H
+#define KEYFRAME_H
 
 #include <particle.h>
-#include <glm.hpp>
-#include <queue>
-#include <memory>
-#include <cassert>
 
 #define MAX_STEP .2
 #define MAX_ANGLE 0.015
-
+#define MAX_WAIT_TIME 1.0
+#define PADDING 2.
+#define POINT_SAMPLE_RADIUS 5.f
 
 class KeyFrame{
 public:
@@ -56,25 +54,4 @@ private:
     double m_targetSeconds;
 };
 
-
-class Animation
-{
-public:
-    Animation(Body *, QList<Particle *> *particles);
-
-    void addKeyFrame(glm::dvec2 pos, int cutAfter = -1);
-    void addRotationKeyframe(double angle, int cutAfter = -1);
-    void addDelay(double seconds, int cutAfter = -1);
-
-    bool tick(double delta);
-
-
-private:
-
-    Body *m_body;
-    std::queue<shared_ptr<KeyFrame>> m_keyFrames;
-    QList<Particle *> *m_particles;
-
-};
-
-#endif // ANIMATION_H
+#endif // KEYFRAME_H

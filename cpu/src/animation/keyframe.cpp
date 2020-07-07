@@ -1,4 +1,4 @@
-#include "animation.h"
+#include "keyframe.h"
 
 
 DelayKeyFrame::DelayKeyFrame(double seconds, int cutAfter) : KeyFrame(0, 0, cutAfter), m_seconds(0.), m_targetSeconds(seconds) {};
@@ -113,39 +113,4 @@ bool PositionKeyFrame::tick(double delta) {
     }
     increaseStepCounter();
     return reachedKeyframe;
-}
-
-
-
-Animation::Animation(Body *body, QList<Particle *> *particles) : m_body(body), m_particles(particles) {}
-
-
-void Animation::addKeyFrame(glm::dvec2 pos, int cutAfter){
-    std::shared_ptr<KeyFrame> kf = std::make_shared<PositionKeyFrame>(m_body, m_particles, pos, cutAfter);
-    m_keyFrames.push(kf);
-}
-
-void Animation::addRotationKeyframe(double angle, int cutAfter){
-    std::shared_ptr<KeyFrame> kf = std::make_shared<RotationKeyFrame>(m_body, m_particles, angle, cutAfter);
-    m_keyFrames.push(kf);
-}
-
-void Animation::addDelay(double seconds, int cutAfter){
-    std::shared_ptr<KeyFrame> kf = std::make_shared<DelayKeyFrame>(seconds, cutAfter);
-    m_keyFrames.push(kf);
-}
-
-bool Animation::tick(double delta){
-
-    if (m_keyFrames.empty())
-        return true;
-
-    // process keyframe, if finished (= returns true) remove from list
-    if (m_keyFrames.front()->tick(delta)){
-        m_keyFrames.pop();
-    }
-
-    if (m_keyFrames.empty())
-        return true;
-    return false;
 }

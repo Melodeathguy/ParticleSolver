@@ -6,7 +6,7 @@
 #include "opensmokeemitter.h"
 #include "solver.h"
 #include "fluidemitter.h"
-#include "animation.h"
+#include "animation/animation.h"
 
 // Number of solver iterations per timestep
 #define SOLVER_ITERATIONS 3

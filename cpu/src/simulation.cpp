@@ -1406,50 +1406,10 @@ void Simulation::initSandDigger()
     body->setAngleReferencePoints(refIdx1, refIdx2);
     vertices.clear();
 
-    int animationCycles = 1000000;
-    double padding = 2.;
-
-    double xPos = diggerPos.x;
-    double yPos = diggerPos.y;
-    double randFloat;
-    double floatRandomAngle;
-    int cutAfter;
-    double aimX, aimY;
-    double nextPointFrame = 5.;
-
-    double spaceLeft =     m_xBoundaries.x + padding + ringRadius;
-    double spaceRight =    m_xBoundaries.y - padding - ringRadius;
-    double spaceTop =      m_yBoundaries.y - padding - ringRadius;
-    double spaceBottom =   m_yBoundaries.x + padding + ringRadius;
-
-    std::cout << spaceLeft << ", " << spaceRight << ", " << spaceBottom << ", " << spaceTop << "\n";
-    Animation *diggerAnimation = new Animation(body, &m_particles);
+    DynamicAnimation *diggerAnimation = new DynamicAnimation(body, &m_particles, m_xBoundaries, m_yBoundaries, diggerRadius, 15);
 
     diggerAnimation->addDelay(5);
 
-
-
-    for(int i = 0; i < animationCycles; i++){
-
-        randFloat = urand(0, 100);
-        cutAfter = (int) urand(1, 25);
-
-        if (randFloat < 40){
-            // move shuffle to a random point
-            aimX = urand(spaceLeft, spaceRight);
-            aimY = urand(spaceBottom, spaceTop);
-            xPos = aimX;
-            yPos = aimY;
-            diggerAnimation->addKeyFrame(glm::dvec2(xPos, yPos), cutAfter);
-        } else if(randFloat < 80){
-            // turn shuffle to a certain angle
-            floatRandomAngle = urand(-PI, PI);
-            diggerAnimation->addRotationKeyframe(floatRandomAngle, cutAfter);
-        } else {
-            diggerAnimation->addDelay(0.2, cutAfter);
-        }
-
-    }
     m_animations.append(diggerAnimation);
 
     double sandMass = 5.;
