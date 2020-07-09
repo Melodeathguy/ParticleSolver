@@ -1415,11 +1415,11 @@ void Simulation::initSandDigger()
     double sandMass = 5.;
 
     for (int i = -24; i <= 24; i++) {
-        for (int j = 0; j < 83; j++) {
+        for (int j = 0; j < 103; j++) {
             double maxOffset = PARTICLE_RAD;
             double xOffset = static_cast <double> (rand()) / (static_cast <double> (RAND_MAX/maxOffset));;
             double xPos = 2 * i * (PARTICLE_DIAM) + xOffset;
-            double yPos = pow(j,0.99) * (PARTICLE_DIAM) + PARTICLE_RAD + m_yBoundaries.x;
+            double yPos = pow(j,0.90) * (PARTICLE_DIAM) + PARTICLE_RAD + m_yBoundaries.x;
             glm::dvec2 pos = glm::dvec2(xPos, yPos);
             Particle *part= new Particle(pos, sandMass, SOLID);
             part->sFriction = .0;
