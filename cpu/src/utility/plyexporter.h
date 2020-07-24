@@ -18,6 +18,11 @@ bool isBigEndian(void)
 }
 */
 
+enum Material {
+    GRAN = 0,
+    SOL = 1
+};
+
 
 class PlyExporter
 {
@@ -27,6 +32,8 @@ public:
 
 
     bool writePoints(int step, QList<Particle *> &particles, int diggerId, Body *digger, float borderRadius = 25);
+
+    bool writeAllPoints(double time, int step, QList<Particle *> &particles, int diggerId, float borderRadius = 25);
 
 
 

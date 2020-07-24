@@ -33,6 +33,7 @@ private:
     QMutex *tickLock = new QMutex(QMutex::NonRecursive);
     bool m_busy;
     double tickStep;
+    double currentTick;
 
     glm::ivec2 dimensions;
     Simulation sim;

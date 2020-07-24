@@ -87,3 +87,56 @@ bool PlyExporter::writePoints(int step, QList<Particle *> &particles, int digger
     return true;
 }
 
+
+bool PlyExporter::writeAllPoints(double time, int step, QList<Particle *> &particles, int diggerId, float borderRadius){
+    m_filename = QDir(m_rootPath).filePath(QString("sand-%1.ply").arg(step, 10, 10, QChar('0')));
+    QFile m_file(m_filename);
+    if (!m_file.open(QIODevice::ReadWrite)){
+        std::cout << "Error opening file: " << m_filename.toStdString() << std::endl;
+        return false;
+    }
+    QTextStream stream(&m_file);
+
+    // writer header
+    stream << "ply" << endl;
+
+    // TODO: Make writing to binary possibly!
+    /*
+    if (m_bigEndian){
+        stream << "format binary_big_endian 1.0" << Qt::endl;
+    } else {
+        stream << "format binary_little_endian 1.0" << Qt::endl;
+    }
+    */
+
+    stream << "format ascii 1.0" << endl;
+
+    stream << "comment step " << step << endl;
+    stream << "comment time " << time << endl;
+
+    stream << "element vertex " << particles.size() << endl;
+    stream << "property float x" << endl;
+    stream << "property float y" << endl;
+    stream << "property float xv" << endl;
+    stream << "property float yv" << endl;
+    stream << "property int mat" << endl; // material
+    stream << "end_header" << endl;
+
+    Particle *part;
+    float x, y, vx, vy;
+    int mat;
+    for (int i = 0; i < particles.size(); i++){
+        // case particle belongs to digger
+        part = particles.at(i);
+        mat = (part->bod == diggerId) ? SOL: GRAN;
+        x = part->p.x / borderRadius;
+        y = part->p.y / borderRadius;
+        vx = part->v.x / borderRadius;
+        vy = part->v.y / borderRadius;
+
+        stream << x << " " << y << " " << vx << " " << vy << " " << mat << endl;
+    }
+    m_file.close();
+
+    return true;
+}

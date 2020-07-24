@@ -21,6 +21,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
     m_frameNo = 0;
     m_busy = false;
     tickStep = 0.0111111111; // for 90 FPS video
+    currentTick = 0.0;
 
 
     srand(std::time(0));
@@ -234,9 +235,12 @@ void View::tick()
         sim.m_animations[i]->tick(tickStep);
     }
 
-    // The exporter uses hints, set by the animations to write the commands
     if (exportSimulationData){
-        exporter->writePoints(m_frameNo, sim.m_particles, 0, sim.m_bodies.at(0));
+
+        // This exporter uses hints, set by the animations to write the commands
+        //exporter->writePoints(m_frameNo, sim.m_particles, 0, sim.m_bodies.at(0));
+
+        exporter->writeAllPoints(this->currentTick, m_frameNo, sim.m_particles, 0);
     }
 
     time.start();
@@ -251,6 +255,7 @@ void View::tick()
             tickTime = 0.0;
         }
     } else {
+        this->currentTick += tickStep;
         sim.tick(tickStep); // 11.11MS -> 90 FPS
         m_frameNo += 1;
     }
