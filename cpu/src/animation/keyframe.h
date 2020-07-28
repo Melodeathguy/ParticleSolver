@@ -3,7 +3,7 @@
 
 #include <particle.h>
 
-#define MAX_STEP .2
+#define MAX_STEP .1
 #define MAX_ANGLE 0.015
 #define MAX_WAIT_TIME 1.0
 #define PADDING 2.

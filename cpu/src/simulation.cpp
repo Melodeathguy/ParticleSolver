@@ -1367,8 +1367,8 @@ void Simulation::initSandDigger()
     // Draw Digger Shuffle
     double diggerRadius = 8.;
     double ringRadius;
-    int diggerRings = 7;
-    glm::dvec2 diggerPos = glm::dvec2(0., 24.);
+    int diggerRings = 5;
+    glm::dvec2 diggerPos = glm::dvec2(0., -15.);
 
     double assemblyAngle;
     QList<Particle *> vertices;
@@ -1408,18 +1408,20 @@ void Simulation::initSandDigger()
 
     DynamicAnimation *diggerAnimation = new DynamicAnimation(body, &m_particles, m_xBoundaries, m_yBoundaries, diggerRadius, 15);
 
-    diggerAnimation->addDelay(5);
+    //diggerAnimation->addDelay(5);
 
     m_animations.append(diggerAnimation);
 
     double sandMass = 5.;
+    double maxOffset = PARTICLE_RAD;
+    double xPos, yPos, xOffset, yOffset;
 
-    for (int i = -24; i <= 24; i++) {
-        for (int j = 0; j < 103; j++) {
-            double maxOffset = PARTICLE_RAD;
-            double xOffset = static_cast <double> (rand()) / (static_cast <double> (RAND_MAX/maxOffset));;
-            double xPos = 2 * i * (PARTICLE_DIAM) + xOffset;
-            double yPos = pow(j,0.90) * (PARTICLE_DIAM) + PARTICLE_RAD + m_yBoundaries.x;
+    for (int i = -25; i <= 25; i++) {
+        for (int j = 0; j < 50; j++) {
+            xOffset = urand(-maxOffset, maxOffset);
+            yOffset = urand(-maxOffset, maxOffset);
+            xPos = 1.95 * i * (PARTICLE_DIAM) + xOffset;
+            yPos = yOffset + pow(j,1.02) * (PARTICLE_DIAM) + PARTICLE_RAD - 3;// + m_yBoundaries.x;
             glm::dvec2 pos = glm::dvec2(xPos, yPos);
             Particle *part= new Particle(pos, sandMass, SOLID);
             part->sFriction = .0;

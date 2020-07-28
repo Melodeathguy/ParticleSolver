@@ -20,10 +20,14 @@
 // Qt data includes
 #include <QList>
 #include <QHash>
+#include <QRandomGenerator>
 
 // Generally helpful functions
 inline float frand() { return (double)rand() / (double)RAND_MAX; }
-inline float urand(double a, double b) { return a + (b - a) * frand(); }
+inline float urand(double a, double b) {
+    srand(QRandomGenerator::global()->generate());
+    return a + (b - a) * frand();
+}
 
 using namespace std;
 
