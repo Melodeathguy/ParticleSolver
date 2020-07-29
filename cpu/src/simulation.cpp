@@ -55,6 +55,12 @@ void Simulation::clear() {
             }
         }
     }
+    for(int i = m_animations.size()-1; i >= 0; i--) {
+        Animation *a = m_animations.at(i);
+        m_animations.removeAt(i);
+        delete(a);
+    }
+
 
     if (m_counts) {
         delete[] m_counts;

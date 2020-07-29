@@ -6,10 +6,10 @@ target_resolution = (640, 360)
 crop_borders = 0.23
 fps = 90.
 
-def main(root):
+def main(root, outPath):
     
     fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-    writer = cv2.VideoWriter('output.avi', fourcc, fps, target_resolution)
+    writer = cv2.VideoWriter(outPath, fourcc, fps, target_resolution)
     
     images = sorted([os.path.join(root, img) for img in os.listdir(root)])
     
@@ -40,4 +40,5 @@ def main(root):
 
 if __name__ == "__main__":
     root_path = sys.argv[1]
-    main(root_path)
+    out_path = sys.argv[2]
+    main(root_path, out_path)

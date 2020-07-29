@@ -33,7 +33,7 @@ public:
 
     bool writePoints(int step, QList<Particle *> &particles, int diggerId, Body *digger, float borderRadius = 25);
 
-    bool writeAllPoints(double time, int step, QList<Particle *> &particles, int diggerId, float borderRadius = 25);
+    bool writeAllPoints(double time, int step, QList<Particle *> &particles, int diggerId, int trajectory, float borderRadius = 25);
 
 
 

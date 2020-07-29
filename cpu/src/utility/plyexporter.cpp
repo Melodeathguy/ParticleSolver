@@ -4,9 +4,9 @@ PlyExporter::PlyExporter(QString rootPath) :
     m_rootPath(rootPath)
 {
     //m_bigEndian = isBigEndian();
-
+    QString trajFolderName = QString("%1").arg(0, 10, 10, QChar('0'));
     // make target directory if not existing
-    if (!QDir(m_rootPath).exists()){
+    if (!QDir(m_rootPath + "/" + trajFolderName).exists()){
         QDir().mkpath(m_rootPath);
     }
 
@@ -88,8 +88,14 @@ bool PlyExporter::writePoints(int step, QList<Particle *> &particles, int digger
 }
 
 
-bool PlyExporter::writeAllPoints(double time, int step, QList<Particle *> &particles, int diggerId, float borderRadius){
-    m_filename = QDir(m_rootPath).filePath(QString("sand-%1.ply").arg(step, 10, 10, QChar('0')));
+bool PlyExporter::writeAllPoints(double time, int step, QList<Particle *> &particles, int diggerId, int trajectory, float borderRadius){
+
+    QString trajFolderName = QString("%1").arg(trajectory, 10, 10, QChar('0'));
+    // make target directory if not existing
+    if (!QDir(m_rootPath + "/" + trajFolderName).exists()){
+        QDir().mkpath(m_rootPath + "/" + trajFolderName);
+    }
+    m_filename = QDir(m_rootPath + "/" + trajFolderName).filePath(QString("sand-%1.ply").arg(step, 10, 10, QChar('0')));
     QFile m_file(m_filename);
     if (!m_file.open(QIODevice::ReadWrite)){
         std::cout << "Error opening file: " << m_filename.toStdString() << std::endl;

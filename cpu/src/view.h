@@ -28,6 +28,9 @@ private:
     bool velocityRenderMode;
     bool allowInteraction;
     bool exportSimulationData;
+    int m_trajectorySteps;
+    int m_trajectory;
+    int m_maxTrajectories;
     PlyExporter *exporter;
 
     QMutex *tickLock = new QMutex(QMutex::NonRecursive);

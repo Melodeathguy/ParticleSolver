@@ -23,8 +23,9 @@ View::View(QWidget *parent) : QGLWidget(parent)
     tickStep = 0.0111111111; // for 90 FPS video
     currentTick = 0.0;
 
-
-    srand(std::time(0));
+    m_trajectory = 0;
+    m_trajectorySteps = 1000;
+    m_maxTrajectories = 1000 + 100 + 100
 
     // TODO: Make automatic!
     double screenHeight = 768;//1050.;
@@ -37,6 +38,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
     allowInteraction = false;
     exportSimulationData = true;
     exporter = new PlyExporter("./export/");
+
 }
 
 View::~View()
@@ -81,14 +83,15 @@ void View::paintGL()
         sim.drawVelocityField();
     }
     else{
-        sim.draw();
+       sim.draw();
     }
 
     glColor3f(1,1,1);
     renderText(10, 20, "FPS: " + QString::number((double) (fps)), this->font());
     renderText(10, 40, "# Particles: " + QString::number(sim.getNumParticles()), this->font());
     renderText(10, 60, "Kinetic Energy: " + QString::number(sim.getKineticEnergy()), this->font());
-    renderText(10, 80, "Frame #: " + QString::number(m_frameNo), this->font());
+    renderText(10, 80, "Trajectory #: " + QString::number(m_trajectory), this->font());
+    renderText(10, 100, "Frame #: " + QString::number(m_frameNo), this->font());
 }
 
 void View::resizeGL(int w, int h)
@@ -240,7 +243,7 @@ void View::tick()
         // This exporter uses hints, set by the animations to write the commands
         //exporter->writePoints(m_frameNo, sim.m_particles, 0, sim.m_bodies.at(0));
 
-        exporter->writeAllPoints(this->currentTick, m_frameNo, sim.m_particles, 0);
+        exporter->writeAllPoints(this->currentTick, m_frameNo, sim.m_particles, 0, m_trajectory);
     }
 
     time.start();
@@ -264,13 +267,24 @@ void View::tick()
     update();
 
     // TODO: make more beautiful
-    QString number = QString("%1").arg(m_frameNo, 20, 10, QChar('0'));
+    QString number = QString("%1").arg(m_frameNo + m_trajectory * m_trajectorySteps, 20, 10, QChar('0'));
+    cout << number.toStdString() << "\n";
     renderImage("/home/stahl/tmp/frame"+ number +".jpg");
+
+    if (m_frameNo >= m_trajectorySteps){
+        m_frameNo = 0;
+        currentTick = 0.0;
+        m_trajectory += 1;
+        if (m_trajectory == m_maxTrajectories){
+            // TODO FIX!
+            delete this;
+        }
+        sim.init(current);
+    }
 
     //tickLock->lock();
     m_busy = false;
     tickLock->unlock();
-
 }
 
 void View::renderImage(QString fileName){
