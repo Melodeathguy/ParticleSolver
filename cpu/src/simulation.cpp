@@ -1387,7 +1387,7 @@ void Simulation::initSandDigger()
     for(int r = 0; r < diggerRings; r++){
 
         ringRadius = diggerRadius + r * PARTICLE_RAD;
-        assemblyAngle = atan(2*PARTICLE_RAD / ringRadius) / 2.0;
+        assemblyAngle = atan(2*PARTICLE_RAD / ringRadius);
 
         for(double a = 0 + (diggerRings-r) * angleOffsetGoingOut; a < PI - (diggerRings-r) * angleOffsetGoingOut; a += assemblyAngle){
             double xPos = ringRadius * cos(-a);
@@ -1421,7 +1421,7 @@ void Simulation::initSandDigger()
     double sandMass = 5.;
     double maxOffset = PARTICLE_RAD;
     double xPos, yPos, xOffset, yOffset;
-
+    /*
     for (int i = -25; i <= 25; i++) {
         for (int j = 0; j < 50; j++) {
             xOffset = urand(-maxOffset, maxOffset);
@@ -1435,6 +1435,25 @@ void Simulation::initSandDigger()
             m_particles.append(part);
         }
     }
+    */
+
+    xOffset = urand(-maxOffset*10, maxOffset*10);
+    yOffset = urand(-maxOffset*10, maxOffset*10);
+
+    float vxOffset = urand(-maxOffset*100, maxOffset*100);
+    float vyOffset = urand(-maxOffset*100, maxOffset*100);
+
+    xPos = 1.95 * 0 * (PARTICLE_DIAM) + xOffset;
+    yPos = yOffset + pow(10,1.02) * (PARTICLE_DIAM) + PARTICLE_RAD - 3;// + m_yBoundaries.x;
+    glm::dvec2 pos = glm::dvec2(xPos, yPos);
+    glm::dvec2 vec = glm::dvec2(vxOffset, vyOffset);
+    Particle *part= new Particle(pos, sandMass, SOLID);
+    part->v = vec;
+    part->sFriction = .0;
+    part->kFriction = .10;
+    m_particles.append(part);
+
+
 }
 
 int Simulation::getNumParticles()

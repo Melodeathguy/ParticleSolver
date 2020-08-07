@@ -16,7 +16,7 @@ View::View(QWidget *parent) : QGLWidget(parent)
     // The game loop is implemented using a timer
     connect(&timer, SIGNAL(timeout()), this, SLOT(tick()));
 
-    fps = 60;
+    fps = 120;
     scale = 50;
     m_frameNo = 0;
     m_busy = false;
@@ -24,8 +24,8 @@ View::View(QWidget *parent) : QGLWidget(parent)
     currentTick = 0.0;
 
     m_trajectory = 0;
-    m_trajectorySteps = 1000;
-    m_maxTrajectories = 1000 + 100 + 100
+    m_trajectorySteps = 300;
+    m_maxTrajectories = 1000 + 100 + 100 + 100; // 1000 Tr, 100 Val, 100 Test, 100 reserve if contains NaN Particle values
 
     // TODO: Make automatic!
     double screenHeight = 768;//1050.;
@@ -55,7 +55,7 @@ void View::initializeGL()
     // Start a timer that will try to get 60 frames per second (the actual
     // frame rate depends on the operating system and other running programs)
     //time.start();
-    timer.start(1000 / 60.);
+    timer.start(1000. / 120);
 
 
     // Center the mouse, which is explained more in mouseMoveEvent() below.
@@ -268,8 +268,7 @@ void View::tick()
 
     // TODO: make more beautiful
     QString number = QString("%1").arg(m_frameNo + m_trajectory * m_trajectorySteps, 20, 10, QChar('0'));
-    cout << number.toStdString() << "\n";
-    renderImage("/home/stahl/tmp/frame"+ number +".jpg");
+    //renderImage("/home/stahl/tmp/frame"+ number +".jpg");
 
     if (m_frameNo >= m_trajectorySteps){
         m_frameNo = 0;
