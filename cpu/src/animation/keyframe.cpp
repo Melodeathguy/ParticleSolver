@@ -27,7 +27,7 @@ bool RotationKeyFrame::tick(double delta) {
         for(int i = 0; i < m_body->particles.size(); i++){
             int particleId = m_body->particles.at(i);
             Particle * part = m_particles->at(particleId);
-            part->v = zeroVec;
+            //part->v = zeroVec;
         }
         increaseStepCounter();
         return true;
@@ -74,7 +74,7 @@ bool RotationKeyFrame::tick(double delta) {
         int particleId = m_body->particles.at(i);
         Particle * part = m_particles->at(particleId);
         glm::dvec2 rotated = glm::rotate(m_body->ccenter - part->p, angleImpulse);
-        part->v = ((m_body->ccenter - rotated)-part->p) / delta;
+        part->v += 0.01 * ((m_body->ccenter - rotated)-part->p) / delta;
     }
     increaseStepCounter();
     return false;
@@ -109,7 +109,7 @@ bool PositionKeyFrame::tick(double delta) {
     for(int i = 0; i < m_body->particles.size(); i++){
         int particleId = m_body->particles.at(i);
         Particle * part = m_particles->at(particleId);
-        part->v = ((aimVector - (m_body->ccenter - part->p)) - part->p) / delta;
+        part->v += 0.1 * ((aimVector - (m_body->ccenter - part->p)) - part->p) / delta;
     }
     increaseStepCounter();
     return reachedKeyframe;

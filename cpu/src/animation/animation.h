@@ -41,7 +41,7 @@ class DynamicAnimation : public Animation
 {
 public:
 
-    DynamicAnimation(Body *body, QList<Particle *> *particles, glm::dvec2 xBoundaries, glm::dvec2 yBoundaries, float radius, int cutAfter = 1, float posProb = 0.5, float rotProb = 0.4, float delayProb = 0.1) :
+    DynamicAnimation(Body *body, QList<Particle *> *particles, glm::dvec2 xBoundaries, glm::dvec2 yBoundaries, float radius, int cutAfter = 1, float posProb = 0.5, float rotProb = 0.5, float delayProb = 0.0) :
         Animation(body, particles),
         m_xBoundaries(xBoundaries),
         m_yBoundaries(yBoundaries),

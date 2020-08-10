@@ -1373,7 +1373,7 @@ void Simulation::initSandDigger()
     // Draw Digger Shuffle
     double diggerRadius = 8.;
     double ringRadius;
-    int diggerRings = 5;
+    int diggerRings = 2;
     glm::dvec2 diggerPos = glm::dvec2(0., -15.);
 
     double assemblyAngle;
@@ -1412,7 +1412,7 @@ void Simulation::initSandDigger()
     body->setAngleReferencePoints(refIdx1, refIdx2);
     vertices.clear();
 
-    DynamicAnimation *diggerAnimation = new DynamicAnimation(body, &m_particles, m_xBoundaries, m_yBoundaries, diggerRadius, 15);
+    DynamicAnimation *diggerAnimation = new DynamicAnimation(body, &m_particles, m_xBoundaries, m_yBoundaries, diggerRadius, 5);
 
     //diggerAnimation->addDelay(5);
 
@@ -1437,21 +1437,24 @@ void Simulation::initSandDigger()
     }
     */
 
-    xOffset = urand(-maxOffset*10, maxOffset*10);
-    yOffset = urand(-maxOffset*10, maxOffset*10);
+    for (int j = 0; j < 250; j++) {
+        xOffset = urand(-maxOffset*50, maxOffset*50);
+        yOffset = urand(-maxOffset*50, maxOffset*50);
 
-    float vxOffset = urand(-maxOffset*100, maxOffset*100);
-    float vyOffset = urand(-maxOffset*100, maxOffset*100);
+        float vxOffset = urand(-maxOffset*50, maxOffset*50);
+        float vyOffset = urand(-maxOffset*50, maxOffset*50);
 
-    xPos = 1.95 * 0 * (PARTICLE_DIAM) + xOffset;
-    yPos = yOffset + pow(10,1.02) * (PARTICLE_DIAM) + PARTICLE_RAD - 3;// + m_yBoundaries.x;
-    glm::dvec2 pos = glm::dvec2(xPos, yPos);
-    glm::dvec2 vec = glm::dvec2(vxOffset, vyOffset);
-    Particle *part= new Particle(pos, sandMass, SOLID);
-    part->v = vec;
-    part->sFriction = .0;
-    part->kFriction = .10;
-    m_particles.append(part);
+        xPos = 1.95 * 0 * (PARTICLE_DIAM) + xOffset;
+        yPos = yOffset + pow(10,1.02) * (PARTICLE_DIAM) + PARTICLE_RAD - 3;// + m_yBoundaries.x;
+        glm::dvec2 pos = glm::dvec2(xPos, yPos);
+        glm::dvec2 vec = glm::dvec2(vxOffset, vyOffset);
+        Particle *part= new Particle(pos, sandMass, SOLID);
+        part->v = vec;
+        part->sFriction = .0;
+        part->kFriction = .10;
+        m_particles.append(part);
+    }
+
 
 
 }
