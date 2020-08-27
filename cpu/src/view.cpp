@@ -24,8 +24,8 @@ View::View(QWidget *parent) : QGLWidget(parent)
     currentTick = 0.0;
 
     m_trajectory = 0;
-    m_trajectorySteps = 300;
-    m_maxTrajectories = 1000 + 100 + 100 + 100; // 1000 Tr, 100 Val, 100 Test, 100 reserve if contains NaN Particle values
+    m_trajectorySteps = 600;
+    m_maxTrajectories = 1000 + 100 + 100 + 10; // 1000 Tr, 100 Val, 100 Test, 100 reserve if contains NaN Particle values
 
     // TODO: Make automatic!
     double screenHeight = 768;//1050.;

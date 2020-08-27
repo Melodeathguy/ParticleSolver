@@ -1437,8 +1437,8 @@ void Simulation::initSandDigger()
     }
     */
 
-    for (int j = 0; j < 250; j++) {
-        xOffset = urand(-maxOffset*50, maxOffset*50);
+    for (int j = 0; j < 500; j++) {
+        xOffset = urand(-maxOffset*75, maxOffset*75);
         yOffset = urand(-maxOffset*50, maxOffset*50);
 
         float vxOffset = urand(-maxOffset*50, maxOffset*50);
